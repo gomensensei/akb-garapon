@@ -49,6 +49,7 @@
 
     <nav class="tab-nav apple-glass-3d" aria-label="Main navigation">
       <button class="tab-button active" data-tab="input" data-i18n="tabInput">入力</button>
+      <button class="tab-button" data-tab="simulator" data-i18n="tabSimulator">抽選模擬器</button>
       <button class="tab-button" data-tab="records" data-i18n="tabRecords">保存記録</button>
       <button class="tab-button" data-tab="public" data-i18n="tabPublic">公開データ</button>
     </nav>
@@ -133,6 +134,69 @@
           <canvas id="previewCanvas" class="record-canvas allow-save" width="720" height="960" aria-label="Card preview"></canvas>
           <p class="safari-note" data-i18n="safariInlineNote">iPhone / Safari では画像プレビューが開きます。長押しして保存してください。</p>
         </aside>
+      </div>
+    </section>
+
+    <section id="tab-simulator" class="tab-panel">
+      <div class="simulator-card apple-glass-3d">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow" data-i18n="simEyebrow">Garapon Simulator</p>
+            <h2 data-i18n="simTitle">ガラポン抽選模擬器</h2>
+          </div>
+          <p class="server-note sim-disclaimer" data-i18n="simGameOnly">純粋なゲーム用シミュレーターです。実際の抽選確率や運営方式とは関係ありません。</p>
+        </div>
+
+        <div class="simulator-layout">
+          <div class="garapon-stage">
+            <div id="garaponMachine" class="garapon-machine" aria-label="Garapon simulator">
+              <div class="garapon-top-pins" aria-hidden="true"><span></span><span></span></div>
+              <div id="garaponDrum" class="garapon-drum" aria-hidden="true">
+                <div class="drum-grain"></div>
+                <div class="drum-window">
+                  <span class="mini-ball white"></span><span class="mini-ball white"></span><span class="mini-ball red"></span><span class="mini-ball green"></span>
+                  <span class="mini-ball white"></span><span class="mini-ball red"></span><span class="mini-ball white"></span><span class="mini-ball green"></span>
+                </div>
+              </div>
+              <div class="garapon-neck" aria-hidden="true"></div>
+              <div class="garapon-stand" aria-hidden="true">
+                <span class="stand-hole small"></span>
+                <span class="stand-hole medium"></span>
+                <span class="stand-hole large"></span>
+              </div>
+              <button id="garaponHandle" class="garapon-handle" type="button" aria-label="Turn the Garapon handle">
+                <span class="handle-arm"></span>
+                <span class="handle-knob"></span>
+              </button>
+              <div class="garapon-base" aria-hidden="true"></div>
+              <div class="garapon-tray" aria-hidden="true"><span id="lastBall" class="last-ball"></span></div>
+            </div>
+            <p id="simHint" class="sim-hint" data-i18n="simHint">ハンドルをつかんでゆっくり回してください。速すぎると玉は出ません。</p>
+          </div>
+
+          <aside class="sim-panel">
+            <div class="sim-kpis">
+              <div class="kpi-card"><small data-i18n="simTotalTurns">抽選回数</small><strong id="simTotalTurns">0</strong></div>
+              <div class="kpi-card"><small data-i18n="simWinRate">当選確率</small><strong id="simWinRate">0%</strong></div>
+            </div>
+
+            <div class="ball-stock" aria-label="Simulator ball stock">
+              <div><span class="stock-dot white"></span><small data-i18n="whiteBall">白玉</small><strong id="stockWhite">250</strong></div>
+              <div><span class="stock-dot red"></span><small data-i18n="redBall">赤玉</small><strong id="stockRed">30</strong></div>
+              <div><span class="stock-dot green"></span><small data-i18n="greenBall">緑玉</small><strong id="stockGreen">20</strong></div>
+            </div>
+
+            <div class="sim-actions">
+              <button type="button" id="resetSimulatorBtn" class="ghost-button" data-i18n="simReset">模擬器をリセット</button>
+            </div>
+
+            <div class="sim-history-head">
+              <h3 data-i18n="simHistoryTitle">直近50回の結果</h3>
+              <span data-i18n="simHistoryNote">最新が上に表示されます。</span>
+            </div>
+            <div id="simRecordList" class="sim-record-list"></div>
+          </aside>
+        </div>
       </div>
     </section>
 

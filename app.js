@@ -6,6 +6,8 @@ const GARAPON_CONFIG = {
   languageKey: 'gomensensei.garapon.language.v1',
   yenPerSpin: 500,
   canvas: { width: 720, height: 960 },
+  simulatorStorageKey: 'gomensensei.garapon.simulator.v1',
+  simulatorDefaults: { white: 250, red: 30, green: 20, maxHistory: 50 },
 };
 
 const PERFORMANCES = [
@@ -109,13 +111,66 @@ const I18N = {
   },
 };
 
-let appState = { lang: 'ja', members: [], records: [] };
+Object.assign(I18N.ja, {
+  tabSimulator: '抽選模擬器', simEyebrow: 'Garapon Simulator', simTitle: 'ガラポン抽選模擬器',
+  simGameOnly: '純粋なゲーム用シミュレーターです。実際の抽選確率や運営方式とは関係ありません。',
+  simHint: 'ハンドルをつかんでゆっくり回してください。速すぎると玉は出ません。',
+  simHintFast: '速すぎます。ゆっくり回すと抽選玉が出ます。', simHintWin: '{ball}が出ました。', simHintEmpty: '抽選玉が残っていません。リセットしてください。',
+  simTotalTurns: '抽選回数', simWinRate: '当選確率', whiteBall: '白玉', redBall: '赤玉', greenBall: '緑玉', simReset: '模擬器をリセット',
+  simHistoryTitle: '直近50回の結果', simHistoryNote: '最新が上に表示されます。', simNoHistory: 'まだ抽選していません。', simWin: '当たり', simLose: 'はずれ',
+});
+Object.assign(I18N['zh-Hant'], {
+  tabSimulator: '抽選模擬器', simEyebrow: 'Garapon Simulator', simTitle: 'ガラポン抽選模擬器',
+  simGameOnly: '純粹遊戲用模擬器，並不代表實際抽選機率或營運方式。',
+  simHint: '請按住手柄慢慢轉動。轉得太快時，抽選玉不會跌出。',
+  simHintFast: '轉得太快了。慢慢轉動才會跌出抽選玉。', simHintWin: '跌出了{ball}。', simHintEmpty: '抽選玉已用完，請重設模擬器。',
+  simTotalTurns: '抽選回數', simWinRate: '當選確率', whiteBall: '白玉', redBall: '紅玉', greenBall: '綠玉', simReset: '重設模擬器',
+  simHistoryTitle: '最近50次結果', simHistoryNote: '最新紀錄會顯示在最上方。', simNoHistory: '尚未進行抽選。', simWin: '当たり', simLose: '未中',
+});
+Object.assign(I18N['zh-Hans'], {
+  tabSimulator: '抽选模拟器', simEyebrow: 'Garapon Simulator', simTitle: 'ガラポン抽选模拟器',
+  simGameOnly: '纯粹游戏用模拟器，并不代表实际抽选概率或运营方式。', simHint: '请按住手柄慢慢转动。转得太快时，抽选玉不会掉出。',
+  simHintFast: '转得太快了。慢慢转动才会掉出抽选玉。', simHintWin: '掉出了{ball}。', simHintEmpty: '抽选玉已用完，请重设模拟器。',
+  simTotalTurns: '抽选次数', simWinRate: '中奖概率', whiteBall: '白玉', redBall: '红玉', greenBall: '绿玉', simReset: '重设模拟器',
+  simHistoryTitle: '最近50次结果', simHistoryNote: '最新记录会显示在最上方。', simNoHistory: '尚未进行抽选。', simWin: '中奖', simLose: '未中',
+});
+Object.assign(I18N.en, {
+  tabSimulator: 'Draw simulator', simEyebrow: 'Garapon Simulator', simTitle: 'Garapon draw simulator',
+  simGameOnly: 'This is a game-only simulator. It does not represent real draw odds or official operation.', simHint: 'Grab the handle and turn slowly. If you spin too fast, no ball will drop.',
+  simHintFast: 'Too fast. Turn slowly to release a ball.', simHintWin: '{ball} dropped.', simHintEmpty: 'No balls left. Please reset the simulator.',
+  simTotalTurns: 'Draw count', simWinRate: 'Win rate', whiteBall: 'White ball', redBall: 'Red ball', greenBall: 'Green ball', simReset: 'Reset simulator',
+  simHistoryTitle: 'Latest 50 results', simHistoryNote: 'Newest result appears at the top.', simNoHistory: 'No draws yet.', simWin: 'Win', simLose: 'Lose',
+});
+Object.assign(I18N.ko, {
+  tabSimulator: '추첨 시뮬레이터', simEyebrow: 'Garapon Simulator', simTitle: '가라폰 추첨 시뮬레이터',
+  simGameOnly: '순수 게임용 시뮬레이터이며 실제 추첨 확률이나 운영 방식과 관계없습니다.', simHint: '손잡이를 잡고 천천히 돌려 주세요. 너무 빠르면 공이 나오지 않습니다.',
+  simHintFast: '너무 빠릅니다. 천천히 돌리면 추첨 공이 나옵니다.', simHintWin: '{ball}이 나왔습니다.', simHintEmpty: '남은 공이 없습니다. 시뮬레이터를 리셋해 주세요.',
+  simTotalTurns: '추첨 횟수', simWinRate: '당첨 확률', whiteBall: '흰 공', redBall: '빨간 공', greenBall: '초록 공', simReset: '시뮬레이터 리셋',
+  simHistoryTitle: '최근 50회 결과', simHistoryNote: '최신 결과가 위에 표시됩니다.', simNoHistory: '아직 추첨하지 않았습니다.', simWin: '당첨', simLose: '꽝',
+});
+Object.assign(I18N.th, {
+  tabSimulator: 'เครื่องจำลองสุ่ม', simEyebrow: 'Garapon Simulator', simTitle: 'เครื่องจำลอง Garapon',
+  simGameOnly: 'เป็นเครื่องจำลองเพื่อความสนุกเท่านั้น ไม่ใช่อัตราจริงหรือวิธีดำเนินงานจริง', simHint: 'จับด้ามแล้วหมุนช้า ๆ ถ้าหมุนเร็วเกินไป ลูกจะไม่ตกออกมา',
+  simHintFast: 'เร็วเกินไป หมุนช้า ๆ เพื่อให้ลูกตกออกมา', simHintWin: '{ball} ออกมาแล้ว', simHintEmpty: 'ไม่มีลูกเหลือแล้ว กรุณารีเซ็ต',
+  simTotalTurns: 'จำนวนสุ่ม', simWinRate: 'อัตราถูกรางวัล', whiteBall: 'ลูกขาว', redBall: 'ลูกแดง', greenBall: 'ลูกเขียว', simReset: 'รีเซ็ตเครื่องจำลอง',
+  simHistoryTitle: 'ผลล่าสุด 50 ครั้ง', simHistoryNote: 'ผลล่าสุดจะแสดงด้านบน', simNoHistory: 'ยังไม่ได้สุ่ม', simWin: 'ถูกรางวัล', simLose: 'ไม่ถูกรางวัล',
+});
+Object.assign(I18N.id, {
+  tabSimulator: 'Simulator undian', simEyebrow: 'Garapon Simulator', simTitle: 'Simulator undian Garapon',
+  simGameOnly: 'Simulator ini hanya untuk permainan dan tidak mewakili peluang undian atau cara operasi sebenarnya.', simHint: 'Pegang tuas dan putar perlahan. Jika terlalu cepat, bola tidak akan keluar.',
+  simHintFast: 'Terlalu cepat. Putar perlahan agar bola keluar.', simHintWin: '{ball} keluar.', simHintEmpty: 'Bola habis. Silakan reset simulator.',
+  simTotalTurns: 'Jumlah undian', simWinRate: 'Win rate', whiteBall: 'Bola putih', redBall: 'Bola merah', greenBall: 'Bola hijau', simReset: 'Reset simulator',
+  simHistoryTitle: '50 hasil terbaru', simHistoryNote: 'Hasil terbaru muncul paling atas.', simNoHistory: 'Belum ada undian.', simWin: 'Menang', simLose: 'Kalah',
+});
+
+let appState = { lang: 'ja', members: [], records: [], simulator: null };
+let simulatorRuntime = { dragging: false, angle: 0, lastAngle: 0, lastTime: 0, accumulatedSlowDelta: 0, lastDropAt: 0 };
 
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => Array.from(document.querySelectorAll(selector));
 
 const els = {
-  languageSelect: $('#languageSelect'), recordForm: $('#recordForm'), editingId: $('#editingId'), nameInput: $('#nameInput'), dateInput: $('#dateInput'), performanceSelect: $('#performanceSelect'), spinCountInput: $('#spinCountInput'), costOutput: $('#costOutput'), winCountInput: $('#winCountInput'), prizeSelect: $('#prizeSelect'), memberSelect: $('#memberSelect'), publicConsentInput: $('#publicConsentInput'), clearFormBtn: $('#clearFormBtn'), downloadCurrentBtn: $('#downloadCurrentBtn'), previewCanvas: $('#previewCanvas'), recordList: $('#recordList'), exportJsonBtn: $('#exportJsonBtn'), importJsonInput: $('#importJsonInput'), deleteAllBtn: $('#deleteAllBtn'), kpiGrid: $('#kpiGrid'), pieCanvas: $('#pieCanvas'), barCanvas: $('#barCanvas'), radarCanvas: $('#radarCanvas'), winRateCanvas: $('#winRateCanvas'), timelineCanvas: $('#timelineCanvas'), memberHeatmap: $('#memberHeatmap'), memberRanking: $('#memberRanking'), performanceRanking: $('#performanceRanking'), winRateRanking: $('#winRateRanking'), roiRanking: $('#roiRanking'), imageDialog: $('#imageDialog'), dialogImage: $('#dialogImage'), closeDialogBtn: $('#closeDialogBtn')
+  languageSelect: $('#languageSelect'), recordForm: $('#recordForm'), editingId: $('#editingId'), nameInput: $('#nameInput'), dateInput: $('#dateInput'), performanceSelect: $('#performanceSelect'), spinCountInput: $('#spinCountInput'), costOutput: $('#costOutput'), winCountInput: $('#winCountInput'), prizeSelect: $('#prizeSelect'), memberSelect: $('#memberSelect'), publicConsentInput: $('#publicConsentInput'), clearFormBtn: $('#clearFormBtn'), downloadCurrentBtn: $('#downloadCurrentBtn'), previewCanvas: $('#previewCanvas'), recordList: $('#recordList'), exportJsonBtn: $('#exportJsonBtn'), importJsonInput: $('#importJsonInput'), deleteAllBtn: $('#deleteAllBtn'), kpiGrid: $('#kpiGrid'), pieCanvas: $('#pieCanvas'), barCanvas: $('#barCanvas'), radarCanvas: $('#radarCanvas'), winRateCanvas: $('#winRateCanvas'), timelineCanvas: $('#timelineCanvas'), memberHeatmap: $('#memberHeatmap'), memberRanking: $('#memberRanking'), performanceRanking: $('#performanceRanking'), winRateRanking: $('#winRateRanking'), roiRanking: $('#roiRanking'), imageDialog: $('#imageDialog'), dialogImage: $('#dialogImage'), closeDialogBtn: $('#closeDialogBtn'), garaponMachine: $('#garaponMachine'), garaponDrum: $('#garaponDrum'), garaponHandle: $('#garaponHandle'), lastBall: $('#lastBall'), simHint: $('#simHint'), simTotalTurns: $('#simTotalTurns'), simWinRate: $('#simWinRate'), stockWhite: $('#stockWhite'), stockRed: $('#stockRed'), stockGreen: $('#stockGreen'), resetSimulatorBtn: $('#resetSimulatorBtn'), simRecordList: $('#simRecordList')
 };
 
 // Future backend adapter reservation.
@@ -156,7 +211,7 @@ function applyLanguage() {
   els.languageSelect.value = appState.lang;
   $$('[data-i18n]').forEach((node) => { node.textContent = t(node.dataset.i18n); });
   $$('[data-i18n-placeholder]').forEach((node) => { node.placeholder = t(node.dataset.i18nPlaceholder); });
-  populatePrizeOptions(); populateMemberOptions(); renderPreviewFromForm(); renderRecords(); renderPublicStats(); updateSubmitButtonLabel();
+  populatePrizeOptions(); populateMemberOptions(); renderPreviewFromForm(); renderRecords(); renderPublicStats(); renderSimulator(); updateSubmitButtonLabel();
 }
 
 function normalizeName(value) { return String(value || '').replace(/\s+/g, '').trim(); }
@@ -236,7 +291,7 @@ function drawRecordCard(ctx, record, width, height) {
   const prize = getPrizeLabel(record.prizeId, true);
   const winLine = record.winCount !== null && record.winCount !== undefined ? `${record.winCount}${t('winsUnit')}${prize ? ` / ${prize}` : ''}` : prize;
   const lines = [
-    record.name || t('anonymous'),
+    record.name ? record.name : '',
     formatDate(record.date),
     performance,
     record.spinCount !== null && record.spinCount !== undefined ? `${record.spinCount}${t('spinsUnit')} / ${formatYen(record.costTotal || 0)}` : '',
@@ -282,7 +337,7 @@ async function deleteRecord(id) { if (!confirm(t('confirmDelete'))) return; appS
 function deleteAllRecords() { if (!appState.records.length) return; if (!confirm(t('confirmDeleteAll'))) return; appState.records = []; persistRecords(); resetForm(); renderRecords(); renderPublicStats(); }
 function exportJson() { const payload = { app: 'gomensensei-garapon-challenge-log', exportedAt: new Date().toISOString(), records: appState.records }; const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' }); const url = URL.createObjectURL(blob); const link = document.createElement('a'); link.href = url; link.download = `garapon-records-${new Date().toISOString().slice(0, 10)}.json`; link.click(); URL.revokeObjectURL(url); }
 function importJson(event) { const file = event.target.files?.[0]; if (!file) return; const reader = new FileReader(); reader.onload = () => { try { const parsed = JSON.parse(String(reader.result || '{}')); const incoming = Array.isArray(parsed) ? parsed : parsed.records; if (!Array.isArray(incoming)) throw new Error('Invalid JSON'); const normalized = incoming.map((record) => ({ ...record, id: record.id || generateId(), schemaVersion: 2 })); const existingIds = new Set(appState.records.map((record) => record.id)); normalized.forEach((record) => { if (existingIds.has(record.id)) record.id = generateId(); }); appState.records = [...normalized, ...appState.records]; persistRecords(); renderRecords(); renderPublicStats(); toast(t('imported')); } catch { toast(t('importFailed')); } finally { event.target.value = ''; } }; reader.readAsText(file); }
-function switchTab(name) { $$('.tab-button').forEach((button) => button.classList.toggle('active', button.dataset.tab === name)); $$('.tab-panel').forEach((panel) => panel.classList.toggle('active', panel.id === `tab-${name}`)); if (name === 'public') renderPublicStats(); }
+function switchTab(name) { $$('.tab-button').forEach((button) => button.classList.toggle('active', button.dataset.tab === name)); $$('.tab-panel').forEach((panel) => panel.classList.toggle('active', panel.id === `tab-${name}`)); if (name === 'public') renderPublicStats(); if (name === 'simulator') renderSimulator(); }
 
 function getPublicRecords() { return appState.records.filter((record) => record.isPublic); }
 function countBy(list, keyFn) { return list.reduce((acc, item) => { const key = keyFn(item); acc[key] = (acc[key] || 0) + 1; return acc; }, {}); }
@@ -366,8 +421,178 @@ function renderRankings(summary) {
   els.roiRanking.innerHTML = roiRows.length ? roiRows.map(([name, value]) => `<div class="ranking-row"><span>${escapeHtml(name)}</span><span>${escapeHtml(value)}</span></div>`).join('') : `<div class="ranking-empty">${t('noPublicRecords')}</div>`;
 }
 
+
+function createDefaultSimulatorState() {
+  const defaults = GARAPON_CONFIG.simulatorDefaults;
+  return { stock: { white: defaults.white, red: defaults.red, green: defaults.green }, history: [] };
+}
+function loadSimulatorState() {
+  try {
+    const raw = localStorage.getItem(GARAPON_CONFIG.simulatorStorageKey);
+    const parsed = raw ? JSON.parse(raw) : null;
+    const defaults = createDefaultSimulatorState();
+    appState.simulator = parsed && parsed.stock && Array.isArray(parsed.history) ? {
+      stock: {
+        white: Math.max(0, Number(parsed.stock.white) || 0),
+        red: Math.max(0, Number(parsed.stock.red) || 0),
+        green: Math.max(0, Number(parsed.stock.green) || 0),
+      },
+      history: parsed.history.slice(0, GARAPON_CONFIG.simulatorDefaults.maxHistory),
+    } : defaults;
+  } catch {
+    appState.simulator = createDefaultSimulatorState();
+  }
+}
+function persistSimulatorState() { if (appState.simulator) localStorage.setItem(GARAPON_CONFIG.simulatorStorageKey, JSON.stringify(appState.simulator)); }
+function getSimulatorTotals() {
+  const history = appState.simulator?.history || [];
+  const wins = history.filter((item) => item.isWin).length;
+  return { total: history.length, wins, winRate: history.length ? (wins / history.length) * 100 : 0 };
+}
+function getBallLabel(color) {
+  if (color === 'red') return t('redBall');
+  if (color === 'green') return t('greenBall');
+  return t('whiteBall');
+}
+function renderSimulator() {
+  if (!els.simRecordList || !appState.simulator) return;
+  const { stock, history } = appState.simulator;
+  const totals = getSimulatorTotals();
+  if (els.simTotalTurns) els.simTotalTurns.textContent = totals.total.toLocaleString();
+  if (els.simWinRate) els.simWinRate.textContent = formatPercent(totals.winRate);
+  if (els.stockWhite) els.stockWhite.textContent = stock.white.toLocaleString();
+  if (els.stockRed) els.stockRed.textContent = stock.red.toLocaleString();
+  if (els.stockGreen) els.stockGreen.textContent = stock.green.toLocaleString();
+  if (!history.length) {
+    els.simRecordList.innerHTML = `<div class="record-empty">${t('simNoHistory')}</div>`;
+    return;
+  }
+  els.simRecordList.innerHTML = history.slice(0, GARAPON_CONFIG.simulatorDefaults.maxHistory).map((item, index) => `
+    <div class="sim-record-row">
+      <span class="stock-dot ${escapeHtml(item.color)}"></span>
+      <strong>${escapeHtml(getBallLabel(item.color))} / ${item.isWin ? t('simWin') : t('simLose')}</strong>
+      <small>#${history.length - index}</small>
+    </div>
+  `).join('');
+}
+function resetSimulator() {
+  appState.simulator = createDefaultSimulatorState();
+  simulatorRuntime.angle = 0;
+  simulatorRuntime.accumulatedSlowDelta = 0;
+  updateSimulatorRotation(0);
+  persistSimulatorState();
+  renderSimulator();
+  if (els.lastBall) { els.lastBall.className = 'last-ball'; }
+  if (els.simHint) els.simHint.textContent = t('simHint');
+}
+function updateSimulatorRotation(angle) {
+  simulatorRuntime.angle = angle;
+  const deg = `${angle * 180 / Math.PI}deg`;
+  if (els.garaponDrum) els.garaponDrum.style.setProperty('--drum-rot', deg);
+  if (els.garaponHandle) els.garaponHandle.style.setProperty('--handle-rot', deg);
+}
+function pointerAngle(event) {
+  const rect = els.garaponHandle.getBoundingClientRect();
+  const cx = rect.left + rect.width / 2;
+  const cy = rect.top + rect.height / 2;
+  return Math.atan2(event.clientY - cy, event.clientX - cx);
+}
+function angleDelta(a, b) {
+  let delta = a - b;
+  while (delta > Math.PI) delta -= Math.PI * 2;
+  while (delta < -Math.PI) delta += Math.PI * 2;
+  return delta;
+}
+function pickSimulatorBall() {
+  const stock = appState.simulator.stock;
+  const total = stock.white + stock.red + stock.green;
+  if (total <= 0) return null;
+  let point = Math.random() * total;
+  if (point < stock.white) return 'white';
+  point -= stock.white;
+  if (point < stock.red) return 'red';
+  return 'green';
+}
+function releaseSimulatorBall() {
+  if (!appState.simulator) return;
+  const color = pickSimulatorBall();
+  if (!color) {
+    if (els.simHint) els.simHint.textContent = t('simHintEmpty');
+    return;
+  }
+  appState.simulator.stock[color] -= 1;
+  const record = { color, isWin: color === 'red' || color === 'green', at: new Date().toISOString() };
+  appState.simulator.history.unshift(record);
+  appState.simulator.history = appState.simulator.history.slice(0, GARAPON_CONFIG.simulatorDefaults.maxHistory);
+  persistSimulatorState();
+  renderSimulator();
+  if (els.lastBall) {
+    els.lastBall.className = `last-ball ${color}`;
+    void els.lastBall.offsetWidth;
+    els.lastBall.classList.add('show');
+  }
+  if (els.simHint) els.simHint.textContent = t('simHintWin', { ball: getBallLabel(color) });
+}
+function maybeDropSimulatorBall(speed, delta) {
+  const now = performance.now();
+  const absSpeed = Math.abs(speed);
+  const absDelta = Math.abs(delta);
+  if (absSpeed > 0.012) {
+    simulatorRuntime.accumulatedSlowDelta = 0;
+    if (absSpeed > 0.02) {
+      if (els.simHint) els.simHint.textContent = t('simHintFast');
+      if (els.garaponMachine) {
+        els.garaponMachine.classList.remove('sim-fast-pulse');
+        void els.garaponMachine.offsetWidth;
+        els.garaponMachine.classList.add('sim-fast-pulse');
+      }
+    }
+    return;
+  }
+  simulatorRuntime.accumulatedSlowDelta += absDelta;
+  if (simulatorRuntime.accumulatedSlowDelta >= Math.PI * 1.65 && now - simulatorRuntime.lastDropAt > 650) {
+    simulatorRuntime.accumulatedSlowDelta = 0;
+    simulatorRuntime.lastDropAt = now;
+    releaseSimulatorBall();
+  }
+}
+function handleSimulatorPointerDown(event) {
+  if (!els.garaponHandle) return;
+  event.preventDefault();
+  simulatorRuntime.dragging = true;
+  simulatorRuntime.lastAngle = pointerAngle(event);
+  simulatorRuntime.lastTime = performance.now();
+  els.garaponHandle.setPointerCapture?.(event.pointerId);
+}
+function handleSimulatorPointerMove(event) {
+  if (!simulatorRuntime.dragging) return;
+  event.preventDefault();
+  const now = performance.now();
+  const currentAngle = pointerAngle(event);
+  const delta = angleDelta(currentAngle, simulatorRuntime.lastAngle);
+  const dt = Math.max(16, now - simulatorRuntime.lastTime);
+  const speed = delta / dt;
+  updateSimulatorRotation(simulatorRuntime.angle + delta);
+  maybeDropSimulatorBall(speed, delta);
+  simulatorRuntime.lastAngle = currentAngle;
+  simulatorRuntime.lastTime = now;
+}
+function handleSimulatorPointerUp(event) {
+  if (!simulatorRuntime.dragging) return;
+  simulatorRuntime.dragging = false;
+  els.garaponHandle?.releasePointerCapture?.(event.pointerId);
+}
+function bindSimulatorEvents() {
+  if (!els.garaponHandle) return;
+  els.garaponHandle.addEventListener('pointerdown', handleSimulatorPointerDown);
+  window.addEventListener('pointermove', handleSimulatorPointerMove, { passive: false });
+  window.addEventListener('pointerup', handleSimulatorPointerUp);
+  window.addEventListener('pointercancel', handleSimulatorPointerUp);
+  els.resetSimulatorBtn?.addEventListener('click', resetSimulator);
+}
+
 async function loadMembers() { try { const response = await fetch('members.json', { cache: 'no-store' }); if (!response.ok) throw new Error('members.json not found'); appState.members = await response.json(); if (typeof initSilentPreloader === 'function') initSilentPreloader(appState.members, 'image', 'imgLoaded'); } catch { appState.members = []; } }
-function bindEvents() { els.languageSelect.addEventListener('change', () => { appState.lang = els.languageSelect.value; localStorage.setItem(GARAPON_CONFIG.languageKey, appState.lang); applyLanguage(); }); $$('.tab-button').forEach((button) => button.addEventListener('click', () => switchTab(button.dataset.tab))); els.recordForm.addEventListener('submit', saveFormRecord); ['input', 'change'].forEach((eventName) => { [els.nameInput, els.dateInput, els.performanceSelect, els.spinCountInput, els.winCountInput, els.prizeSelect, els.memberSelect, els.publicConsentInput].forEach((node) => node.addEventListener(eventName, debounce(renderPreviewFromForm, 60))); }); els.clearFormBtn.addEventListener('click', resetForm); els.downloadCurrentBtn.addEventListener('click', () => downloadRecordCard(collectFormRecord({ keepId: false }))); els.recordList.addEventListener('click', handleRecordListClick); els.exportJsonBtn.addEventListener('click', exportJson); els.importJsonInput.addEventListener('change', importJson); els.deleteAllBtn.addEventListener('click', deleteAllRecords); els.closeDialogBtn.addEventListener('click', () => els.imageDialog.close()); window.addEventListener('resize', debounce(() => { renderPreviewFromForm(); renderPublicStats(); }, 180)); }
-async function init() { appState.lang = detectLanguage(); loadRecords(); populatePerformanceOptions(); await loadMembers(); populateMemberOptions(); bindEvents(); applyLanguage(); updateCost(); renderRecords(); renderPublicStats(); renderPreviewFromForm(); }
+function bindEvents() { els.languageSelect.addEventListener('change', () => { appState.lang = els.languageSelect.value; localStorage.setItem(GARAPON_CONFIG.languageKey, appState.lang); applyLanguage(); }); $$('.tab-button').forEach((button) => button.addEventListener('click', () => switchTab(button.dataset.tab))); els.recordForm.addEventListener('submit', saveFormRecord); ['input', 'change'].forEach((eventName) => { [els.nameInput, els.dateInput, els.performanceSelect, els.spinCountInput, els.winCountInput, els.prizeSelect, els.memberSelect, els.publicConsentInput].forEach((node) => node.addEventListener(eventName, debounce(renderPreviewFromForm, 60))); }); els.clearFormBtn.addEventListener('click', resetForm); els.downloadCurrentBtn.addEventListener('click', () => downloadRecordCard(collectFormRecord({ keepId: false }))); els.recordList.addEventListener('click', handleRecordListClick); els.exportJsonBtn.addEventListener('click', exportJson); els.importJsonInput.addEventListener('change', importJson); els.deleteAllBtn.addEventListener('click', deleteAllRecords); els.closeDialogBtn.addEventListener('click', () => els.imageDialog.close()); bindSimulatorEvents(); window.addEventListener('resize', debounce(() => { renderPreviewFromForm(); renderPublicStats(); }, 180)); }
+async function init() { appState.lang = detectLanguage(); loadRecords(); loadSimulatorState(); populatePerformanceOptions(); await loadMembers(); populateMemberOptions(); bindEvents(); applyLanguage(); updateCost(); renderRecords(); renderPublicStats(); renderSimulator(); renderPreviewFromForm(); }
 
 document.addEventListener('DOMContentLoaded', init);
