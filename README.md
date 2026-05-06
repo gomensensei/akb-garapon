@@ -1,20 +1,28 @@
-# ガラポンチャレンジ記録 / Garapon Challenge Log
+# ガラポンチャレンジ記録
 
-AKB48 劇場公演のガラポンチャレンジを記録する非公式ファンツールです。GitHub Pages にそのまま置ける Vanilla JS 構成です。
+AKB48 劇場公演のガラポンチャレンジを記録し、資料カード画像として保存できる非公式ファンツールです。
 
-## 機能
+## 主な機能
 
-- 姓名、日期、公演、転珠次數、中獎數、中獎項目、2ショット撮影メンバーを任意入力
-- 1回 500円として花費總額を自動計算
-- 本地長期紀錄：`localStorage` に保存
-- 資料カード PNG 出力
-- iPhone / Safari では画像プレビューをモーダル表示し、長押し保存を案内
-- 「公開可」チェック付き。現在は本機内だけで公開統計を表示
-- 公開許可データを KPI、pie chart、vertical bar chart、radar chart、ranking で表示
-- 繁體中文、簡體中文、英文、日本語、韓文、泰文、印尼文対応
-- 装置言語自動判定 + 右上言語切替
-- 2ショット撮影メンバーは `members.json` から生成
-- 3D mouse tracking は微幅設定済み
+- 姓名、日期、公演、抽選回数、当たり数、当選内容、2ショット撮影メンバーを任意入力で保存
+- 抽選回数 × 500円で消費総額を自動計算
+- localStorage による端末内長期保存
+- iPhone / Safari では画像プレビューを開き、長押し保存を案内
+- 公開可フラグを保存し、将来のアカウント制・サーバー保存に備えた `backendAdapter` を予約
+- 公開可データから以下を集計
+  - 人数
+  - 抽選玉
+  - 消費総額
+  - 当たり
+  - 当選確率
+  - 平均消費額
+  - 当選内容比率
+  - 公演別当選確率
+  - Member Heatmap
+  - 公演別 ROI
+  - 時間軸分析
+- 日本語、繁體中文、简体中文、English、한국어、ไทย、Indonesia 対応
+- 端末言語の自動判定と右上言語切替
 
 ## ファイル構成
 
@@ -28,16 +36,16 @@ members.json
 README.md
 ```
 
-## GitHub Pages への置き方
+## GitHub Pages への設置
 
-1. 上記ファイルを同じフォルダに置く。
-2. GitHub repository にアップロードする。
-3. Settings → Pages → Branch を `main` / root に設定する。
-4. 公開 URL にアクセスする。
+1. 上記ファイルを GitHub リポジトリにアップロードします。
+2. Settings → Pages を開きます。
+3. Branch を `main`、folder を `/root` に設定します。
+4. 数分後に公開 URL が発行されます。
 
-## 将来の server save / account 化について
+## サーバー保存を追加する場合
 
-`app.js` 内に `backendAdapter` を用意しています。
+現在は完全な静的サイトです。実際にアカウント制やクラウド保存を行う場合は、`app.js` 内の `backendAdapter` を Supabase / Firebase / 自前 API に差し替えてください。
 
 ```js
 const backendAdapter = {
@@ -47,8 +55,8 @@ const backendAdapter = {
 };
 ```
 
-日後登入帳號、公開數據上傳、server-side aggregation を実装する場合は、この adapter を API 呼び出しに差し替えてください。公開統計には `record.isPublic === true` の記録だけを送信する想定です。
+公開統計へ同期する対象は、必ず `record.isPublic === true` の記録だけにしてください。
 
-## 注意
+## 非公式表記
 
 本サイトはファンである ゴメン先生 (gomensensei) が作成した非公式のものであり、AKB48運営とは一切関係ありません。各権利者に帰属します。

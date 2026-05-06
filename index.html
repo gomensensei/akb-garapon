@@ -21,7 +21,7 @@
       <span class="brand-mark">G</span>
       <span>
         <strong data-i18n="appTitle">ガラポンチャレンジ記録</strong>
-        <em data-i18n="appSubtitle">500円ごとの挑戦を、きれいに残す。</em>
+        <em data-i18n="appSubtitle">劇場ガラポンを、あとから見返せる記録に。</em>
       </span>
     </a>
     <div class="topbar-actions">
@@ -44,10 +44,7 @@
         <h1 data-i18n="heroTitle">ガラポンの記録を、あとから見返せる形に。</h1>
         <p data-i18n="heroLead">姓名・公演・回数・当選内容を保存し、資料カードとして画像化できます。すべて任意入力、保存はまず端末内だけです。</p>
       </div>
-      <div class="hero-meter" aria-hidden="true">
-        <div class="hero-chip">¥500 / spin</div>
-        <div class="hero-bubble float-anim">🎟️</div>
-      </div>
+
     </section>
 
     <nav class="tab-nav apple-glass-3d" aria-label="Main navigation">
@@ -184,9 +181,21 @@
             <h3 data-i18n="radarTitle">全体バランス</h3>
             <canvas id="radarCanvas" width="420" height="320"></canvas>
           </article>
+          <article class="chart-box">
+            <h3 data-i18n="winRateChartTitle">公演別当選確率</h3>
+            <canvas id="winRateCanvas" width="420" height="320"></canvas>
+          </article>
+          <article class="chart-box">
+            <h3 data-i18n="timelineTitle">時間軸分析</h3>
+            <canvas id="timelineCanvas" width="420" height="320"></canvas>
+          </article>
         </div>
 
         <div class="ranking-grid">
+          <article>
+            <h3 data-i18n="memberHeatmapTitle">Member Heatmap</h3>
+            <div id="memberHeatmap" class="member-heatmap"></div>
+          </article>
           <article>
             <h3 data-i18n="memberRankingTitle">2ショット撮影メンバー</h3>
             <div id="memberRanking" class="ranking-list"></div>
@@ -194,6 +203,14 @@
           <article>
             <h3 data-i18n="performanceRankingTitle">公演別サマリー</h3>
             <div id="performanceRanking" class="ranking-list"></div>
+          </article>
+          <article>
+            <h3 data-i18n="winRateRankingTitle">公演別当選確率</h3>
+            <div id="winRateRanking" class="ranking-list"></div>
+          </article>
+          <article>
+            <h3 data-i18n="roiRankingTitle">公演別 ROI</h3>
+            <div id="roiRanking" class="ranking-list"></div>
           </article>
         </div>
       </div>
