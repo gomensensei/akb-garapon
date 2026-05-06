@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#ff4f9a" />
+  <title>ガラポンチャレンジ記録</title>
+  <meta name="description" content="AKB48 劇場公演のガラポンチャレンジをローカル保存・資料カード化できる非公式ファンツール。" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="core.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="native-feel">
+  <div class="bg-orb orb-a" aria-hidden="true"></div>
+  <div class="bg-orb orb-b" aria-hidden="true"></div>
+
+  <header class="topbar">
+    <a class="brand" href="#input" aria-label="Garapon Challenge Recorder">
+      <span class="brand-mark">G</span>
+      <span>
+        <strong data-i18n="appTitle">ガラポンチャレンジ記録</strong>
+        <em data-i18n="appSubtitle">500円ごとの挑戦を、きれいに残す。</em>
+      </span>
+    </a>
+    <div class="topbar-actions">
+      <select id="languageSelect" class="language-select" aria-label="Language">
+        <option value="ja">日本語</option>
+        <option value="zh-Hant">繁體中文</option>
+        <option value="zh-Hans">简体中文</option>
+        <option value="en">English</option>
+        <option value="ko">한국어</option>
+        <option value="th">ไทย</option>
+        <option value="id">Indonesia</option>
+      </select>
+    </div>
+  </header>
+
+  <main class="app-shell">
+    <section class="hero apple-glass-3d">
+      <div class="hero-copy">
+        <p class="eyebrow" data-i18n="eyebrow">AKB48 Theater Fan Tool</p>
+        <h1 data-i18n="heroTitle">ガラポンの記録を、あとから見返せる形に。</h1>
+        <p data-i18n="heroLead">姓名・公演・回数・当選内容を保存し、資料カードとして画像化できます。すべて任意入力、保存はまず端末内だけです。</p>
+      </div>
+      <div class="hero-meter" aria-hidden="true">
+        <div class="hero-chip">¥500 / spin</div>
+        <div class="hero-bubble float-anim">🎟️</div>
+      </div>
+    </section>
+
+    <nav class="tab-nav apple-glass-3d" aria-label="Main navigation">
+      <button class="tab-button active" data-tab="input" data-i18n="tabInput">入力</button>
+      <button class="tab-button" data-tab="records" data-i18n="tabRecords">保存記録</button>
+      <button class="tab-button" data-tab="public" data-i18n="tabPublic">公開データ</button>
+    </nav>
+
+    <section id="tab-input" class="tab-panel active">
+      <div class="grid-layout">
+        <form id="recordForm" class="control-card apple-glass-3d" autocomplete="off">
+          <input type="hidden" id="editingId" value="" />
+
+          <div class="section-head">
+            <div>
+              <p class="eyebrow" data-i18n="formEyebrow">Challenge Log</p>
+              <h2 data-i18n="formTitle">記録を入力</h2>
+            </div>
+            <button type="button" id="clearFormBtn" class="ghost-button" data-i18n="clearForm">クリア</button>
+          </div>
+
+          <div class="form-grid">
+            <label class="field">
+              <span data-i18n="nameLabel">姓名</span>
+              <input id="nameInput" type="text" inputmode="text" placeholder="ゴメン先生" data-i18n-placeholder="namePlaceholder" />
+            </label>
+
+            <label class="field">
+              <span data-i18n="dateLabel">日期</span>
+              <input id="dateInput" type="date" />
+            </label>
+
+            <label class="field wide">
+              <span data-i18n="performanceLabel">公演</span>
+              <select id="performanceSelect"></select>
+            </label>
+
+            <label class="field">
+              <span data-i18n="spinCountLabel">転珠次數</span>
+              <input id="spinCountInput" type="number" min="0" step="1" inputmode="numeric" placeholder="0" />
+            </label>
+
+            <label class="field readonly-field">
+              <span data-i18n="costTotalLabel">花費總額</span>
+              <output id="costOutput">¥0</output>
+              <small data-i18n="costHint">1回 500円で自動計算</small>
+            </label>
+
+            <label class="field">
+              <span data-i18n="winCountLabel">中獎數</span>
+              <input id="winCountInput" type="number" min="0" step="1" inputmode="numeric" placeholder="0" />
+            </label>
+
+            <label class="field wide">
+              <span data-i18n="prizeLabel">中獎項目</span>
+              <select id="prizeSelect"></select>
+            </label>
+
+            <label class="field wide">
+              <span data-i18n="memberLabel">2ショット撮影メンバー</span>
+              <select id="memberSelect"></select>
+            </label>
+          </div>
+
+          <label class="public-consent">
+            <input id="publicConsentInput" type="checkbox" />
+            <span>
+              <strong data-i18n="publicConsentTitle">この記録を将来の公開統計に使ってもよい</strong>
+              <small data-i18n="publicConsentText">現在は端末内だけに保存されます。将来ログイン／サーバー保存を実装するための予約項目です。</small>
+            </span>
+          </label>
+
+          <div class="form-actions">
+            <button type="submit" class="primary-button hover-glow" data-i18n="saveRecord">保存する</button>
+            <button type="button" id="downloadCurrentBtn" class="secondary-button hover-glow" data-i18n="downloadCurrent">資料カードを作成</button>
+          </div>
+        </form>
+
+        <aside class="preview-card apple-glass-3d">
+          <div class="section-head compact">
+            <div>
+              <p class="eyebrow" data-i18n="previewEyebrow">Live Preview</p>
+              <h2 data-i18n="previewTitle">資料カード</h2>
+            </div>
+          </div>
+          <canvas id="previewCanvas" class="record-canvas allow-save" width="720" height="960" aria-label="Card preview"></canvas>
+          <p class="safari-note" data-i18n="safariInlineNote">iPhone / Safari では画像プレビューが開きます。長押しして保存してください。</p>
+        </aside>
+      </div>
+    </section>
+
+    <section id="tab-records" class="tab-panel">
+      <div class="records-card apple-glass-3d">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow" data-i18n="recordsEyebrow">Local Storage</p>
+            <h2 data-i18n="recordsTitle">保存された記録</h2>
+          </div>
+          <div class="records-actions">
+            <button type="button" id="exportJsonBtn" class="ghost-button" data-i18n="exportJson">JSONを書き出し</button>
+            <label class="ghost-button file-button">
+              <span data-i18n="importJson">JSONを読み込み</span>
+              <input id="importJsonInput" type="file" accept="application/json,.json" />
+            </label>
+            <button type="button" id="deleteAllBtn" class="danger-button" data-i18n="deleteAll">全削除</button>
+          </div>
+        </div>
+        <div id="recordList" class="record-list"></div>
+      </div>
+    </section>
+
+    <section id="tab-public" class="tab-panel">
+      <div class="stats-card apple-glass-3d">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow" data-i18n="publicEyebrow">Public-ready Analytics</p>
+            <h2 data-i18n="publicTitle">公開許可データの集計</h2>
+          </div>
+          <p class="server-note" data-i18n="serverNote">現在はローカル保存された「公開可」記録のみ集計します。</p>
+        </div>
+
+        <div id="kpiGrid" class="kpi-grid"></div>
+
+        <div class="chart-grid">
+          <article class="chart-box">
+            <h3 data-i18n="pieTitle">中獎項目比率</h3>
+            <canvas id="pieCanvas" width="420" height="320"></canvas>
+          </article>
+          <article class="chart-box">
+            <h3 data-i18n="barTitle">公演別・轉珠次數</h3>
+            <canvas id="barCanvas" width="420" height="320"></canvas>
+          </article>
+          <article class="chart-box">
+            <h3 data-i18n="radarTitle">全体バランス</h3>
+            <canvas id="radarCanvas" width="420" height="320"></canvas>
+          </article>
+        </div>
+
+        <div class="ranking-grid">
+          <article>
+            <h3 data-i18n="memberRankingTitle">2ショット撮影メンバー</h3>
+            <div id="memberRanking" class="ranking-list"></div>
+          </article>
+          <article>
+            <h3 data-i18n="performanceRankingTitle">公演別サマリー</h3>
+            <div id="performanceRanking" class="ranking-list"></div>
+          </article>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>本サイトはファンである ゴメン先生 (gomensensei) が作成した非公式のものであり、AKB48運営とは一切関係ありません。各権利者に帰属します。</p>
+  </footer>
+
+  <dialog id="imageDialog" class="image-dialog apple-glass-3d">
+    <button type="button" id="closeDialogBtn" class="dialog-close" aria-label="Close">×</button>
+    <h2 data-i18n="imageDialogTitle">画像プレビュー</h2>
+    <p data-i18n="iosSafariMessage">iPhone / Safari では画像プレビューが開きます。長押しして保存してください。</p>
+    <img id="dialogImage" class="allow-save" alt="Garapon challenge card preview" />
+  </dialog>
+
+  <script src="core.js"></script>
+  <script src="app.js" defer></script>
+</body>
+</html>
