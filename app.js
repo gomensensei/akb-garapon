@@ -164,7 +164,7 @@ Object.assign(I18N.id, {
 });
 
 let appState = { lang: 'ja', members: [], records: [], simulator: null };
-let simulatorRuntime = { dragging: false, angle: 0, lastAngle: 0, lastTime: 0, accumulatedSlowDelta: 0, lastDropAt: 0 };
+let simulatorRuntime = { dragging: false, angle: 0, lastAngle: 0, lastTime: 0, accumulatedSlowDelta: 0, smoothedSpeed: 0, lastDropAt: 0, lastFastNoticeAt: 0 };
 
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => Array.from(document.querySelectorAll(selector));
@@ -479,6 +479,7 @@ function resetSimulator() {
   appState.simulator = createDefaultSimulatorState();
   simulatorRuntime.angle = 0;
   simulatorRuntime.accumulatedSlowDelta = 0;
+  simulatorRuntime.smoothedSpeed = 0;
   updateSimulatorRotation(0);
   persistSimulatorState();
   renderSimulator();
@@ -488,6 +489,7 @@ function resetSimulator() {
 function updateSimulatorRotation(angle) {
   simulatorRuntime.angle = angle;
   const deg = `${angle * 180 / Math.PI}deg`;
+  if (els.garaponMachine) els.garaponMachine.style.setProperty('--drum-rot', deg);
   if (els.garaponDrum) els.garaponDrum.style.setProperty('--drum-rot', deg);
   if (els.garaponHandle) els.garaponHandle.style.setProperty('--handle-rot', deg);
 }
@@ -537,9 +539,13 @@ function maybeDropSimulatorBall(speed, delta) {
   const now = performance.now();
   const absSpeed = Math.abs(speed);
   const absDelta = Math.abs(delta);
-  if (absSpeed > 0.012) {
+  simulatorRuntime.smoothedSpeed = simulatorRuntime.smoothedSpeed * 0.72 + absSpeed * 0.28;
+  const slowLimit = 0.022;
+  const fastLimit = 0.045;
+  if (simulatorRuntime.smoothedSpeed > fastLimit) {
     simulatorRuntime.accumulatedSlowDelta = 0;
-    if (absSpeed > 0.02) {
+    if (now - simulatorRuntime.lastFastNoticeAt > 420) {
+      simulatorRuntime.lastFastNoticeAt = now;
       if (els.simHint) els.simHint.textContent = t('simHintFast');
       if (els.garaponMachine) {
         els.garaponMachine.classList.remove('sim-fast-pulse');
@@ -549,8 +555,12 @@ function maybeDropSimulatorBall(speed, delta) {
     }
     return;
   }
+  if (simulatorRuntime.smoothedSpeed > slowLimit) {
+    simulatorRuntime.accumulatedSlowDelta = Math.max(0, simulatorRuntime.accumulatedSlowDelta - absDelta * 0.35);
+    return;
+  }
   simulatorRuntime.accumulatedSlowDelta += absDelta;
-  if (simulatorRuntime.accumulatedSlowDelta >= Math.PI * 1.65 && now - simulatorRuntime.lastDropAt > 650) {
+  if (simulatorRuntime.accumulatedSlowDelta >= Math.PI * 1.8 && now - simulatorRuntime.lastDropAt > 850) {
     simulatorRuntime.accumulatedSlowDelta = 0;
     simulatorRuntime.lastDropAt = now;
     releaseSimulatorBall();
@@ -562,6 +572,7 @@ function handleSimulatorPointerDown(event) {
   simulatorRuntime.dragging = true;
   simulatorRuntime.lastAngle = pointerAngle(event);
   simulatorRuntime.lastTime = performance.now();
+  simulatorRuntime.smoothedSpeed = 0;
   els.garaponHandle.setPointerCapture?.(event.pointerId);
 }
 function handleSimulatorPointerMove(event) {
