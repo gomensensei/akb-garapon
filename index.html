@@ -150,13 +150,9 @@
         <div class="simulator-layout">
           <div class="garapon-stage">
             <div id="garaponMachine" class="garapon-machine" aria-label="Garapon simulator">
-              <div class="garapon-top-pins" aria-hidden="true"><span></span><span></span></div>
               <div id="garaponDrum" class="garapon-drum" aria-hidden="true">
                 <div class="drum-grain"></div>
-                <div class="drum-window">
-                  <span class="mini-ball white"></span><span class="mini-ball white"></span><span class="mini-ball red"></span><span class="mini-ball green"></span>
-                  <span class="mini-ball white"></span><span class="mini-ball red"></span><span class="mini-ball white"></span><span class="mini-ball green"></span>
-                </div>
+                <div class="drum-window"></div>
               </div>
               <div class="garapon-neck" aria-hidden="true"></div>
               <div class="garapon-stand" aria-hidden="true">
@@ -178,12 +174,6 @@
             <div class="sim-kpis">
               <div class="kpi-card"><small data-i18n="simTotalTurns">抽選回数</small><strong id="simTotalTurns">0</strong></div>
               <div class="kpi-card"><small data-i18n="simWinRate">当選確率</small><strong id="simWinRate">0%</strong></div>
-            </div>
-
-            <div class="ball-stock" aria-label="Simulator ball stock">
-              <div><span class="stock-dot white"></span><small data-i18n="whiteBall">白玉</small><strong id="stockWhite">250</strong></div>
-              <div><span class="stock-dot red"></span><small data-i18n="redBall">赤玉</small><strong id="stockRed">30</strong></div>
-              <div><span class="stock-dot green"></span><small data-i18n="greenBall">緑玉</small><strong id="stockGreen">20</strong></div>
             </div>
 
             <div class="sim-actions">
@@ -235,23 +225,23 @@
         <div class="chart-grid">
           <article class="chart-box">
             <h3 data-i18n="pieTitle">中獎項目比率</h3>
-            <canvas id="pieCanvas" width="420" height="320"></canvas>
+            <canvas id="pieCanvas" width="420" height="220"></canvas>
           </article>
           <article class="chart-box">
             <h3 data-i18n="barTitle">公演別・轉珠次數</h3>
-            <canvas id="barCanvas" width="420" height="320"></canvas>
+            <canvas id="barCanvas" width="420" height="220"></canvas>
           </article>
           <article class="chart-box">
             <h3 data-i18n="radarTitle">全体バランス</h3>
-            <canvas id="radarCanvas" width="420" height="320"></canvas>
+            <canvas id="radarCanvas" width="420" height="220"></canvas>
           </article>
           <article class="chart-box">
             <h3 data-i18n="winRateChartTitle">公演別当選確率</h3>
-            <canvas id="winRateCanvas" width="420" height="320"></canvas>
+            <canvas id="winRateCanvas" width="420" height="220"></canvas>
           </article>
           <article class="chart-box">
             <h3 data-i18n="timelineTitle">時間軸分析</h3>
-            <canvas id="timelineCanvas" width="420" height="320"></canvas>
+            <canvas id="timelineCanvas" width="420" height="220"></canvas>
           </article>
         </div>
 

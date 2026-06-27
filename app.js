@@ -170,7 +170,7 @@ const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => Array.from(document.querySelectorAll(selector));
 
 const els = {
-  languageSelect: $('#languageSelect'), recordForm: $('#recordForm'), editingId: $('#editingId'), nameInput: $('#nameInput'), dateInput: $('#dateInput'), performanceSelect: $('#performanceSelect'), spinCountInput: $('#spinCountInput'), costOutput: $('#costOutput'), winCountInput: $('#winCountInput'), prizeSelect: $('#prizeSelect'), memberSelect: $('#memberSelect'), publicConsentInput: $('#publicConsentInput'), clearFormBtn: $('#clearFormBtn'), downloadCurrentBtn: $('#downloadCurrentBtn'), previewCanvas: $('#previewCanvas'), recordList: $('#recordList'), exportJsonBtn: $('#exportJsonBtn'), importJsonInput: $('#importJsonInput'), deleteAllBtn: $('#deleteAllBtn'), kpiGrid: $('#kpiGrid'), pieCanvas: $('#pieCanvas'), barCanvas: $('#barCanvas'), radarCanvas: $('#radarCanvas'), winRateCanvas: $('#winRateCanvas'), timelineCanvas: $('#timelineCanvas'), memberHeatmap: $('#memberHeatmap'), memberRanking: $('#memberRanking'), performanceRanking: $('#performanceRanking'), winRateRanking: $('#winRateRanking'), roiRanking: $('#roiRanking'), imageDialog: $('#imageDialog'), dialogImage: $('#dialogImage'), closeDialogBtn: $('#closeDialogBtn'), garaponMachine: $('#garaponMachine'), garaponDrum: $('#garaponDrum'), garaponHandle: $('#garaponHandle'), lastBall: $('#lastBall'), simHint: $('#simHint'), simTotalTurns: $('#simTotalTurns'), simWinRate: $('#simWinRate'), stockWhite: $('#stockWhite'), stockRed: $('#stockRed'), stockGreen: $('#stockGreen'), resetSimulatorBtn: $('#resetSimulatorBtn'), simRecordList: $('#simRecordList')
+  languageSelect: $('#languageSelect'), recordForm: $('#recordForm'), editingId: $('#editingId'), nameInput: $('#nameInput'), dateInput: $('#dateInput'), performanceSelect: $('#performanceSelect'), spinCountInput: $('#spinCountInput'), costOutput: $('#costOutput'), winCountInput: $('#winCountInput'), prizeSelect: $('#prizeSelect'), memberSelect: $('#memberSelect'), publicConsentInput: $('#publicConsentInput'), clearFormBtn: $('#clearFormBtn'), downloadCurrentBtn: $('#downloadCurrentBtn'), previewCanvas: $('#previewCanvas'), recordList: $('#recordList'), exportJsonBtn: $('#exportJsonBtn'), importJsonInput: $('#importJsonInput'), deleteAllBtn: $('#deleteAllBtn'), kpiGrid: $('#kpiGrid'), pieCanvas: $('#pieCanvas'), barCanvas: $('#barCanvas'), radarCanvas: $('#radarCanvas'), winRateCanvas: $('#winRateCanvas'), timelineCanvas: $('#timelineCanvas'), memberHeatmap: $('#memberHeatmap'), memberRanking: $('#memberRanking'), performanceRanking: $('#performanceRanking'), winRateRanking: $('#winRateRanking'), roiRanking: $('#roiRanking'), imageDialog: $('#imageDialog'), dialogImage: $('#dialogImage'), closeDialogBtn: $('#closeDialogBtn'), garaponMachine: $('#garaponMachine'), garaponDrum: $('#garaponDrum'), garaponHandle: $('#garaponHandle'), lastBall: $('#lastBall'), simHint: $('#simHint'), simTotalTurns: $('#simTotalTurns'), simWinRate: $('#simWinRate'), resetSimulatorBtn: $('#resetSimulatorBtn'), simRecordList: $('#simRecordList')
 };
 
 // Future backend adapter reservation.
@@ -382,12 +382,18 @@ function summarizePublic(records) {
 function renderPublicStats() {
   const publicRecords = getPublicRecords();
   if (!els.kpiGrid) return;
+  const chartGrid = document.querySelector('.chart-grid');
+  const rankingGrid = document.querySelector('.ranking-grid');
   if (!publicRecords.length) {
     els.kpiGrid.innerHTML = `<div class="record-empty" style="grid-column:1/-1">${t('noPublicRecords')}</div>`;
+    if (chartGrid) chartGrid.style.display = 'none';
+    if (rankingGrid) rankingGrid.style.display = 'none';
     [els.pieCanvas, els.barCanvas, els.radarCanvas, els.winRateCanvas, els.timelineCanvas].forEach(clearChart);
     [els.memberHeatmap, els.memberRanking, els.performanceRanking, els.winRateRanking, els.roiRanking].forEach((node) => { if (node) node.innerHTML = `<div class="ranking-empty">${t('noPublicRecords')}</div>`; });
     return;
   }
+  if (chartGrid) chartGrid.style.display = '';
+  if (rankingGrid) rankingGrid.style.display = '';
   const summary = summarizePublic(publicRecords);
   const kpis = [[t('people'), summary.peopleCount.toLocaleString()], [t('records'), summary.recordCount.toLocaleString()], [t('lotteryBalls'), summary.spinTotal.toLocaleString()], [t('cost'), formatYen(summary.costTotal)], [t('wins'), summary.winTotal.toLocaleString()], [t('winRate'), formatPercent(summary.winRate)], [t('avgSpend'), formatYen(summary.avgSpend)]];
   els.kpiGrid.innerHTML = kpis.map(([label, value]) => `<div class="kpi-card"><small>${escapeHtml(label)}</small><strong>${escapeHtml(value)}</strong></div>`).join('');
@@ -456,13 +462,10 @@ function getBallLabel(color) {
 }
 function renderSimulator() {
   if (!els.simRecordList || !appState.simulator) return;
-  const { stock, history } = appState.simulator;
+  const { history } = appState.simulator;
   const totals = getSimulatorTotals();
   if (els.simTotalTurns) els.simTotalTurns.textContent = totals.total.toLocaleString();
   if (els.simWinRate) els.simWinRate.textContent = formatPercent(totals.winRate);
-  if (els.stockWhite) els.stockWhite.textContent = stock.white.toLocaleString();
-  if (els.stockRed) els.stockRed.textContent = stock.red.toLocaleString();
-  if (els.stockGreen) els.stockGreen.textContent = stock.green.toLocaleString();
   if (!history.length) {
     els.simRecordList.innerHTML = `<div class="record-empty">${t('simNoHistory')}</div>`;
     return;
