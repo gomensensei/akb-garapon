@@ -131,6 +131,12 @@
       : (user && user.email ? user.email : "Tool48 user");
   }
 
+  function redirectAfterAuthIfNeeded() {
+    var target = document.body && document.body.dataset ? document.body.dataset.tool48AuthRedirect : "";
+    if (!target || !getUser()) return;
+    window.location.href = target;
+  }
+
   function notify() {
     listeners.forEach(function (listener) {
       try { listener(session); } catch (error) { console.warn("Tool48 auth listener failed", error); }
@@ -259,9 +265,11 @@
           if (action === "signup") {
             var signupData = await signUpWithPassword(email, password, nickname);
             if (message) message.textContent = signupData.session ? text("signupReady") : text("signupNeedsConfirm");
+            if (signupData.session) redirectAfterAuthIfNeeded();
           } else {
             await signInWithPassword(email, password);
             if (message) message.textContent = text("signinReady");
+            redirectAfterAuthIfNeeded();
           }
         } catch (error) {
           if (message) message.textContent = error.message || text("authFailed");
