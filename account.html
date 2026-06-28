@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="zh-Hant">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -21,12 +21,21 @@
     <a class="brand" href="index.html" aria-label="Back to Garapon">
       <span class="brand-mark">T</span>
       <span>
-        <strong>Tool48 Account</strong>
-        <em>Optional cloud save for theater-day tools.</em>
+        <strong data-i18n="accountBrand">Tool48 Account</strong>
+        <em data-i18n="accountSubtitle">Optional cloud save for theater-day tools.</em>
       </span>
     </a>
     <div class="topbar-actions">
-      <a class="ghost-button account-link" href="index.html">Garapon</a>
+      <select id="languageSelect" class="language-select" aria-label="Language">
+        <option value="zh-Hant">繁體中文</option>
+        <option value="zh-Hans">简体中文</option>
+        <option value="ja">日本語</option>
+        <option value="en">English</option>
+        <option value="ko">한국어</option>
+        <option value="th">ไทย</option>
+        <option value="id">Indonesia</option>
+      </select>
+      <a class="ghost-button account-link" href="index.html" data-i18n="openGaraponShort">Garapon</a>
     </div>
   </header>
 
@@ -34,12 +43,12 @@
     <section class="control-card apple-glass-3d account-card">
       <div class="section-head">
         <div>
-          <p class="eyebrow">Optional Account</p>
-          <h1>Tool48 Account</h1>
+          <p class="eyebrow" data-i18n="accountEyebrow">Optional Account</p>
+          <h1 data-i18n="accountTitle">Tool48 Account</h1>
         </div>
       </div>
 
-      <p class="server-note">
+      <p class="server-note" data-i18n="accountLead">
         Login is optional. All tools can still be used without an account.
         Account features add cloud save, cross-device sync, and opt-in anonymous public statistics.
       </p>
@@ -49,40 +58,54 @@
 
         <form class="cloud-login-form" data-tool48-login-form data-tool48-auth-logged-out>
           <label class="field">
-            <span>Email magic link</span>
+            <span data-i18n="cloudNicknameLabel">Nickname</span>
+            <input type="text" autocomplete="nickname" placeholder="gomensensei" data-tool48-nickname data-i18n-placeholder="cloudNicknamePlaceholder" />
+          </label>
+          <label class="field">
+            <span data-i18n="cloudEmailLabel">Account email</span>
             <input type="email" autocomplete="email" required placeholder="you@example.com" data-tool48-email />
           </label>
-          <button type="submit" class="primary-button hover-glow">Send magic link</button>
+          <label class="field">
+            <span data-i18n="cloudPasswordLabel">Password</span>
+            <input type="password" autocomplete="current-password" required minlength="6" placeholder="6+ characters" data-tool48-password data-i18n-placeholder="cloudPasswordPlaceholder" />
+          </label>
+          <button type="submit" class="primary-button hover-glow" data-tool48-auth-action="signin" data-i18n="cloudSignIn">Sign in</button>
+          <button type="submit" class="secondary-button hover-glow" data-tool48-auth-action="signup" data-i18n="cloudCreateAccount">Create account</button>
           <p class="server-note" data-tool48-auth-message></p>
         </form>
 
         <div class="cloud-actions" data-tool48-auth-logged-in>
           <div class="kpi-card">
-            <small>Signed in</small>
+            <small data-i18n="signedInLabel">Signed in</small>
+            <strong data-tool48-auth-nickname></strong>
+          </div>
+          <div class="kpi-card">
+            <small data-i18n="accountEmailLabel">Account email</small>
             <strong data-tool48-auth-email></strong>
           </div>
-          <button type="button" class="secondary-button hover-glow" data-tool48-sign-out>Sign out</button>
+          <button type="button" class="secondary-button hover-glow" data-tool48-sign-out data-i18n="cloudSignOut">Sign out</button>
         </div>
 
-        <p class="server-note" data-tool48-auth-unconfigured>
+        <p class="server-note" data-tool48-auth-unconfigured data-i18n="cloudUnconfigured">
           Cloud save is not configured, but local Garapon records still work.
         </p>
       </div>
 
       <div class="form-actions">
-        <a class="secondary-button hover-glow account-link" href="index.html">Open Garapon</a>
-        <a class="ghost-button account-link" href="https://gomensensei.github.io/">Back to Hub</a>
+        <a class="secondary-button hover-glow account-link" href="index.html" data-i18n="openGarapon">Open Garapon</a>
+        <a class="ghost-button account-link" href="https://gomensensei.github.io/" data-i18n="backToHub">Back to Hub</a>
       </div>
     </section>
   </main>
 
   <footer class="site-footer">
-    <p>Tool48 is an unofficial fan-made project. Private records stay private unless you explicitly opt in to anonymous public statistics.</p>
+    <p data-i18n="accountFooter">Tool48 is an unofficial fan-made project. Private records stay private unless you explicitly opt in to anonymous public statistics.</p>
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="assets/js/supabase-config.js"></script>
   <script src="assets/js/supabase-client.js"></script>
+  <script src="assets/js/account-page.js"></script>
   <script src="assets/js/auth.js"></script>
   <script src="core.js"></script>
 </body>
