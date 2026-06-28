@@ -1084,8 +1084,6 @@ function renderCloudPanel() {
 }
 
 function bindCloudEvents() {
-  els.syncLocalBtn?.addEventListener('click', syncLocalRecordsToCloud);
-  els.loadCloudBtn?.addEventListener('click', loadCloudRecords);
   window.Tool48Auth?.onAuthStateChange?.((session) => {
     appState.session = session;
     const userId = session?.user?.id || '';
