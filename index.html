@@ -4,6 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#ff4f9a" />
+  <link rel="icon" href="data:," />
   <title>ガラポンチャレンジ記録</title>
   <meta name="description" content="AKB48 劇場公演のガラポンチャレンジをローカル保存・資料カード化できる非公式ファンツール。" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -34,6 +35,7 @@
         <option value="th">ไทย</option>
         <option value="id">Indonesia</option>
       </select>
+      <a class="ghost-button account-link" href="account.html">Account</a>
     </div>
   </header>
 
@@ -206,6 +208,28 @@
             <button type="button" id="deleteAllBtn" class="danger-button" data-i18n="deleteAll">全削除</button>
           </div>
         </div>
+        <section id="cloudPanel" class="cloud-panel" aria-live="polite">
+          <div class="cloud-copy">
+            <p class="eyebrow" data-i18n="cloudEyebrow">Optional Cloud Save</p>
+            <h3 data-i18n="cloudTitle">Account sync</h3>
+            <p id="cloudStatus" class="server-note" data-tool48-auth-status data-i18n="cloudChecking">Checking account status...</p>
+          </div>
+          <form id="cloudLoginForm" class="cloud-login-form" data-tool48-login-form data-tool48-auth-logged-out>
+            <label class="field cloud-email-field">
+              <span data-i18n="cloudEmailLabel">Email magic link</span>
+              <input type="email" autocomplete="email" required placeholder="you@example.com" data-tool48-email />
+            </label>
+            <button type="submit" class="primary-button hover-glow" data-i18n="cloudSendLink">Send magic link</button>
+            <p class="server-note" data-tool48-auth-message></p>
+          </form>
+          <div id="cloudActions" class="cloud-actions" data-tool48-auth-logged-in>
+            <button type="button" id="syncLocalBtn" class="secondary-button hover-glow" data-i18n="cloudSyncLocal">Sync local records</button>
+            <button type="button" id="loadCloudBtn" class="ghost-button" data-i18n="cloudLoadRecords">Load cloud records</button>
+            <button type="button" class="ghost-button" data-tool48-sign-out data-i18n="cloudSignOut">Sign out</button>
+          </div>
+          <p id="cloudMessage" class="server-note"></p>
+          <p class="server-note" data-tool48-auth-unconfigured data-i18n="cloudUnconfigured">Cloud save is not configured. Local records still work.</p>
+        </section>
         <div id="recordList" class="record-list"></div>
       </div>
     </section>
@@ -217,7 +241,7 @@
             <p class="eyebrow" data-i18n="publicEyebrow">Public-ready Analytics</p>
             <h2 data-i18n="publicTitle">公開許可データの集計</h2>
           </div>
-          <p class="server-note" data-i18n="serverNote">現在はローカル保存された「公開可」記録のみ集計します。</p>
+          <p id="publicSourceNote" class="server-note" data-i18n="serverNote">現在はローカル保存された「公開可」記録のみ集計します。</p>
         </div>
 
         <div id="kpiGrid" class="kpi-grid"></div>
@@ -282,6 +306,10 @@
     <img id="dialogImage" class="allow-save" alt="Garapon challenge card preview" />
   </dialog>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="assets/js/supabase-config.js"></script>
+  <script src="assets/js/supabase-client.js"></script>
+  <script src="assets/js/auth.js"></script>
   <script src="core.js"></script>
   <script src="app.js" defer></script>
 </body>

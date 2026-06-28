@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#ff4f9a" />
+  <link rel="icon" href="data:," />
+  <title>Tool48 Account</title>
+  <meta name="description" content="Optional Tool48 account login for Garapon cloud save." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="core.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="native-feel">
+  <div class="bg-orb orb-a" aria-hidden="true"></div>
+  <div class="bg-orb orb-b" aria-hidden="true"></div>
+
+  <header class="topbar">
+    <a class="brand" href="index.html" aria-label="Back to Garapon">
+      <span class="brand-mark">T</span>
+      <span>
+        <strong>Tool48 Account</strong>
+        <em>Optional cloud save for theater-day tools.</em>
+      </span>
+    </a>
+    <div class="topbar-actions">
+      <a class="ghost-button account-link" href="index.html">Garapon</a>
+    </div>
+  </header>
+
+  <main class="app-shell account-shell">
+    <section class="control-card apple-glass-3d account-card">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Optional Account</p>
+          <h1>Tool48 Account</h1>
+        </div>
+      </div>
+
+      <p class="server-note">
+        Login is optional. All tools can still be used without an account.
+        Account features add cloud save, cross-device sync, and opt-in anonymous public statistics.
+      </p>
+
+      <div class="cloud-panel">
+        <p class="server-note" data-tool48-auth-status>Checking account status...</p>
+
+        <form class="cloud-login-form" data-tool48-login-form data-tool48-auth-logged-out>
+          <label class="field">
+            <span>Email magic link</span>
+            <input type="email" autocomplete="email" required placeholder="you@example.com" data-tool48-email />
+          </label>
+          <button type="submit" class="primary-button hover-glow">Send magic link</button>
+          <p class="server-note" data-tool48-auth-message></p>
+        </form>
+
+        <div class="cloud-actions" data-tool48-auth-logged-in>
+          <div class="kpi-card">
+            <small>Signed in</small>
+            <strong data-tool48-auth-email></strong>
+          </div>
+          <button type="button" class="secondary-button hover-glow" data-tool48-sign-out>Sign out</button>
+        </div>
+
+        <p class="server-note" data-tool48-auth-unconfigured>
+          Cloud save is not configured, but local Garapon records still work.
+        </p>
+      </div>
+
+      <div class="form-actions">
+        <a class="secondary-button hover-glow account-link" href="index.html">Open Garapon</a>
+        <a class="ghost-button account-link" href="https://gomensensei.github.io/">Back to Hub</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>Tool48 is an unofficial fan-made project. Private records stay private unless you explicitly opt in to anonymous public statistics.</p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="assets/js/supabase-config.js"></script>
+  <script src="assets/js/supabase-client.js"></script>
+  <script src="assets/js/auth.js"></script>
+  <script src="core.js"></script>
+</body>
+</html>

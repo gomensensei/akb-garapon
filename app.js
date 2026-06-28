@@ -163,14 +163,39 @@ Object.assign(I18N.id, {
   simHistoryTitle: '50 hasil terbaru', simHistoryNote: 'Hasil terbaru muncul paling atas.', simNoHistory: 'Belum ada undian.', simWin: 'Menang', simLose: 'Kalah',
 });
 
-let appState = { lang: 'ja', members: [], records: [], simulator: null };
+const CLOUD_I18N = {
+  cloudEyebrow: 'Optional Cloud Save',
+  cloudTitle: 'Account sync',
+  cloudChecking: 'Checking account status...',
+  cloudEmailLabel: 'Email magic link',
+  cloudSendLink: 'Send magic link',
+  cloudSyncLocal: 'Sync local records',
+  cloudLoadRecords: 'Load cloud records',
+  cloudSignOut: 'Sign out',
+  cloudUnconfigured: 'Cloud save is not configured. Local records still work.',
+  cloudLoginRequired: 'Sign in to sync records across devices.',
+  cloudReady: 'Signed in. Local records still stay on this device unless you sync them.',
+  cloudSyncing: 'Syncing local records...',
+  cloudLoading: 'Loading cloud records...',
+  cloudSynced: 'Cloud sync complete: {count} record(s) saved.',
+  cloudLoaded: 'Loaded {count} cloud record(s).',
+  cloudFailed: 'Cloud action failed. Local records were not changed.',
+  cloudNoRecords: 'No local records to sync.',
+  cloudBadge: 'Cloud',
+  publicCloudSource: 'Showing approved anonymous cloud submissions only.',
+  publicLocalSource: 'Currently calculated only from local records marked as public-ready.',
+  publicNotEnough: 'Not enough anonymous public data yet. Detailed breakdowns appear from 10 approved records.',
+};
+Object.keys(I18N).forEach((lang) => Object.assign(I18N[lang], CLOUD_I18N));
+
+let appState = { lang: 'ja', members: [], records: [], simulator: null, session: null, cloudPublicRecords: [], cloudStatsLoaded: false };
 let simulatorRuntime = { dragging: false, angle: 0, lastAngle: 0, lastTime: 0, accumulatedSlowDelta: 0, smoothedSpeed: 0, lastDropAt: 0, lastFastNoticeAt: 0 };
 
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => Array.from(document.querySelectorAll(selector));
 
 const els = {
-  languageSelect: $('#languageSelect'), recordForm: $('#recordForm'), editingId: $('#editingId'), nameInput: $('#nameInput'), dateInput: $('#dateInput'), performanceSelect: $('#performanceSelect'), spinCountInput: $('#spinCountInput'), costOutput: $('#costOutput'), winCountInput: $('#winCountInput'), prizeSelect: $('#prizeSelect'), memberSelect: $('#memberSelect'), publicConsentInput: $('#publicConsentInput'), clearFormBtn: $('#clearFormBtn'), downloadCurrentBtn: $('#downloadCurrentBtn'), previewCanvas: $('#previewCanvas'), recordList: $('#recordList'), exportJsonBtn: $('#exportJsonBtn'), importJsonInput: $('#importJsonInput'), deleteAllBtn: $('#deleteAllBtn'), kpiGrid: $('#kpiGrid'), pieCanvas: $('#pieCanvas'), barCanvas: $('#barCanvas'), radarCanvas: $('#radarCanvas'), winRateCanvas: $('#winRateCanvas'), timelineCanvas: $('#timelineCanvas'), memberHeatmap: $('#memberHeatmap'), memberRanking: $('#memberRanking'), performanceRanking: $('#performanceRanking'), winRateRanking: $('#winRateRanking'), roiRanking: $('#roiRanking'), imageDialog: $('#imageDialog'), dialogImage: $('#dialogImage'), closeDialogBtn: $('#closeDialogBtn'), garaponMachine: $('#garaponMachine'), garaponDrum: $('#garaponDrum'), garaponHandle: $('#garaponHandle'), lastBall: $('#lastBall'), simHint: $('#simHint'), simTotalTurns: $('#simTotalTurns'), simWinRate: $('#simWinRate'), resetSimulatorBtn: $('#resetSimulatorBtn'), simRecordList: $('#simRecordList')
+  languageSelect: $('#languageSelect'), recordForm: $('#recordForm'), editingId: $('#editingId'), nameInput: $('#nameInput'), dateInput: $('#dateInput'), performanceSelect: $('#performanceSelect'), spinCountInput: $('#spinCountInput'), costOutput: $('#costOutput'), winCountInput: $('#winCountInput'), prizeSelect: $('#prizeSelect'), memberSelect: $('#memberSelect'), publicConsentInput: $('#publicConsentInput'), clearFormBtn: $('#clearFormBtn'), downloadCurrentBtn: $('#downloadCurrentBtn'), previewCanvas: $('#previewCanvas'), recordList: $('#recordList'), exportJsonBtn: $('#exportJsonBtn'), importJsonInput: $('#importJsonInput'), deleteAllBtn: $('#deleteAllBtn'), kpiGrid: $('#kpiGrid'), pieCanvas: $('#pieCanvas'), barCanvas: $('#barCanvas'), radarCanvas: $('#radarCanvas'), winRateCanvas: $('#winRateCanvas'), timelineCanvas: $('#timelineCanvas'), memberHeatmap: $('#memberHeatmap'), memberRanking: $('#memberRanking'), performanceRanking: $('#performanceRanking'), winRateRanking: $('#winRateRanking'), roiRanking: $('#roiRanking'), imageDialog: $('#imageDialog'), dialogImage: $('#dialogImage'), closeDialogBtn: $('#closeDialogBtn'), garaponMachine: $('#garaponMachine'), garaponDrum: $('#garaponDrum'), garaponHandle: $('#garaponHandle'), lastBall: $('#lastBall'), simHint: $('#simHint'), simTotalTurns: $('#simTotalTurns'), simWinRate: $('#simWinRate'), resetSimulatorBtn: $('#resetSimulatorBtn'), simRecordList: $('#simRecordList'), cloudPanel: $('#cloudPanel'), cloudStatus: $('#cloudStatus'), cloudMessage: $('#cloudMessage'), syncLocalBtn: $('#syncLocalBtn'), loadCloudBtn: $('#loadCloudBtn'), publicSourceNote: $('#publicSourceNote')
 };
 
 // Future backend adapter reservation.
@@ -178,9 +203,227 @@ const els = {
 // 注意：只有 record.isPublic === true 的紀錄才應同步到公開統計資料表。
 const backendAdapter = {
   async saveRecord(record) { return { ok: true, mode: 'local-only', record }; },
-  async deleteRecord(recordId) { return { ok: true, mode: 'local-only', recordId }; },
-  async syncPublicRecord(record) { return record.isPublic ? { ok: true, mode: 'reserved-for-server', record } : { ok: true, skipped: true }; },
+  async deleteRecord(record) {
+    const client = getSupabaseClient();
+    const user = getAuthUser();
+    if (!client || !user || !record?.cloudRecordId) return { ok: true, mode: 'local-only', record };
+    const { error } = await client.from('garapon_records').delete().eq('id', record.cloudRecordId);
+    if (error) throw error;
+    await markPublicSubmissionDeleted(record.cloudRecordId);
+    return { ok: true, mode: 'cloud-deleted', record };
+  },
+  async syncPublicRecord(record) {
+    if (!record?.cloudRecordId) return { ok: true, skipped: true };
+    return record.isPublic ? createPublicSubmission(record) : markPublicSubmissionDeleted(record.cloudRecordId);
+  },
 };
+
+function getSupabaseClient() {
+  return window.Tool48Supabase?.getClient ? window.Tool48Supabase.getClient() : null;
+}
+
+function getAuthUser() {
+  return window.Tool48Auth?.getUser ? window.Tool48Auth.getUser() : null;
+}
+
+function setCloudMessage(message) {
+  if (els.cloudMessage) els.cloudMessage.textContent = message || '';
+}
+
+function toDbRecord(record, userId) {
+  return {
+    user_id: userId,
+    event_date: record.date || null,
+    performance_id: record.performanceId || null,
+    spin_count: record.spinCount || 0,
+    cost_yen: record.costTotal || 0,
+    win_count: record.winCount || 0,
+    prize_type: record.prizeId || null,
+    member_id: record.twoShotMemberId || null,
+    name_private: record.name || null,
+    private_note: null,
+    public_consent: Boolean(record.isPublic),
+    public_status: record.isPublic ? 'approved' : 'private',
+    source: 'web',
+  };
+}
+
+function fromDbRecord(row) {
+  return {
+    id: `cloud_${row.id}`,
+    cloudRecordId: row.id,
+    name: row.name_private || '',
+    date: row.event_date || '',
+    performanceId: row.performance_id || '',
+    spinCount: row.spin_count ?? null,
+    costTotal: row.cost_yen ?? null,
+    winCount: row.win_count ?? null,
+    prizeId: row.prize_type || '',
+    twoShotMemberId: row.member_id || '',
+    isPublic: Boolean(row.public_consent),
+    createdAt: row.created_at || new Date().toISOString(),
+    updatedAt: row.updated_at || row.created_at || new Date().toISOString(),
+    schemaVersion: 2,
+  };
+}
+
+function publicPayloadFromRecord(record) {
+  return {
+    event_date: record.date || null,
+    performance_id: record.performanceId || null,
+    spin_count: record.spinCount || 0,
+    cost_yen: record.costTotal || 0,
+    win_count: record.winCount || 0,
+    prize_type: record.prizeId || null,
+    member_id: record.twoShotMemberId || null,
+  };
+}
+
+function recordFromPublicPayload(payload) {
+  return {
+    id: generateId(),
+    name: '',
+    date: payload?.event_date || '',
+    performanceId: payload?.performance_id || '',
+    spinCount: payload?.spin_count ?? null,
+    costTotal: payload?.cost_yen ?? null,
+    winCount: payload?.win_count ?? null,
+    prizeId: payload?.prize_type || '',
+    twoShotMemberId: payload?.member_id || '',
+    isPublic: true,
+    schemaVersion: 2,
+  };
+}
+
+function getRecordSignature(record) {
+  return [record.date || '', record.performanceId || '', record.spinCount || 0, record.winCount || 0, record.prizeId || '', record.twoShotMemberId || '', record.createdAt || ''].join('|');
+}
+
+async function saveRecordToCloud(record) {
+  const client = getSupabaseClient();
+  const user = getAuthUser();
+  if (!client || !user) throw new Error(t('cloudLoginRequired'));
+  const payload = toDbRecord(record, user.id);
+  let result;
+  if (record.cloudRecordId) {
+    result = await client.from('garapon_records').update(payload).eq('id', record.cloudRecordId).select('id').single();
+  } else {
+    result = await client.from('garapon_records').insert(payload).select('id').single();
+  }
+  if (result.error) throw result.error;
+  record.cloudRecordId = result.data.id;
+  await backendAdapter.syncPublicRecord(record);
+  return record;
+}
+
+async function createPublicSubmission(record) {
+  const client = getSupabaseClient();
+  const user = getAuthUser();
+  if (!client || !user || !record.cloudRecordId) return { ok: true, skipped: true };
+  await markPublicSubmissionDeleted(record.cloudRecordId);
+  const { error } = await client.from('public_submissions').insert({
+    source_table: 'garapon_records',
+    source_id: record.cloudRecordId,
+    user_id: user.id,
+    tool_slug: 'garapon',
+    public_payload: publicPayloadFromRecord(record),
+    status: 'approved',
+    approved_at: new Date().toISOString(),
+  });
+  if (error) throw error;
+  return { ok: true, mode: 'public-submission-created' };
+}
+
+async function markPublicSubmissionDeleted(cloudRecordId) {
+  const client = getSupabaseClient();
+  const user = getAuthUser();
+  if (!client || !user || !cloudRecordId) return { ok: true, skipped: true };
+  const { error } = await client.from('public_submissions')
+    .update({ status: 'deleted' })
+    .eq('source_table', 'garapon_records')
+    .eq('source_id', cloudRecordId)
+    .eq('user_id', user.id);
+  if (error) throw error;
+  return { ok: true, mode: 'public-submission-deleted' };
+}
+
+async function syncLocalRecordsToCloud() {
+  if (!appState.records.length) { setCloudMessage(t('cloudNoRecords')); return; }
+  setCloudMessage(t('cloudSyncing'));
+  try {
+    const client = getSupabaseClient();
+    const user = getAuthUser();
+    if (!client || !user) throw new Error(t('cloudLoginRequired'));
+    const existing = await client.from('garapon_records').select('id,event_date,performance_id,spin_count,win_count,prize_type,member_id,created_at');
+    if (existing.error) throw existing.error;
+    const existingBySignature = new Map((existing.data || []).map((row) => [getRecordSignature(fromDbRecord(row)), row.id]));
+    let savedCount = 0;
+    for (const record of appState.records) {
+      if (!record.cloudRecordId && existingBySignature.has(getRecordSignature(record))) record.cloudRecordId = existingBySignature.get(getRecordSignature(record));
+      await saveRecordToCloud(record);
+      savedCount += 1;
+    }
+    persistRecords();
+    renderRecords();
+    await refreshCloudPublicStats();
+    setCloudMessage(t('cloudSynced', { count: savedCount }));
+  } catch (error) {
+    console.warn('Garapon cloud sync failed', error);
+    setCloudMessage(error.message || t('cloudFailed'));
+  }
+}
+
+async function loadCloudRecords() {
+  setCloudMessage(t('cloudLoading'));
+  try {
+    const client = getSupabaseClient();
+    const user = getAuthUser();
+    if (!client || !user) throw new Error(t('cloudLoginRequired'));
+    const { data, error } = await client.from('garapon_records')
+      .select('id,event_date,performance_id,spin_count,cost_yen,win_count,prize_type,member_id,name_private,public_consent,created_at,updated_at')
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+    const incoming = (data || []).map(fromDbRecord);
+    const byCloudId = new Map(appState.records.filter((record) => record.cloudRecordId).map((record) => [record.cloudRecordId, record]));
+    incoming.forEach((record) => {
+      const existing = byCloudId.get(record.cloudRecordId);
+      if (existing) Object.assign(existing, record, { id: existing.id });
+      else appState.records.unshift(record);
+    });
+    persistRecords();
+    renderRecords();
+    renderPublicStats();
+    setCloudMessage(t('cloudLoaded', { count: incoming.length }));
+  } catch (error) {
+    console.warn('Garapon cloud load failed', error);
+    setCloudMessage(error.message || t('cloudFailed'));
+  }
+}
+
+async function refreshCloudPublicStats() {
+  const client = getSupabaseClient();
+  if (!client) { appState.cloudStatsLoaded = false; return; }
+  try {
+    const { data, error } = await client.from('public_submissions')
+      .select('public_payload,created_at')
+      .eq('tool_slug', 'garapon')
+      .eq('status', 'approved');
+    if (error) throw error;
+    appState.cloudPublicRecords = (data || []).map((row) => recordFromPublicPayload(row.public_payload));
+    appState.cloudStatsLoaded = true;
+    renderPublicStats();
+  } catch (error) {
+    console.warn('Garapon public stats load failed', error);
+    appState.cloudStatsLoaded = false;
+    renderPublicStats();
+  }
+}
+
+function getStatsVisibility(sampleSize) {
+  if (sampleSize < 5) return 'hidden';
+  if (sampleSize < 10) return 'coarse';
+  return 'detailed';
+}
 
 function t(key, vars = {}) {
   const dict = I18N[appState.lang] || I18N.ja;
@@ -259,7 +502,7 @@ async function saveFormRecord(event) {
   const record = collectFormRecord({ keepId: true });
   const existingIndex = appState.records.findIndex((item) => item.id === record.id);
   if (existingIndex >= 0) { appState.records[existingIndex] = record; toast(t('updated')); } else { appState.records.unshift(record); toast(t('saved')); }
-  persistRecords(); await backendAdapter.saveRecord(record); await backendAdapter.syncPublicRecord(record);
+  persistRecords(); await backendAdapter.saveRecord(record);
   renderRecords(); renderPublicStats(); renderPreview(record); updateSubmitButtonLabel();
 }
 
@@ -327,19 +570,20 @@ function renderRecords() {
     const prize = getPrizeLabel(record.prizeId) || t('noPrize');
     const member = getMember(record.twoShotMemberId);
     const title = [record.name || t('anonymous'), formatDate(record.date), performance].filter(Boolean).join(' ・ ');
-    const meta = [record.spinCount !== null && record.spinCount !== undefined ? `${record.spinCount}${t('spinsUnit')} / ${formatYen(record.costTotal || 0)}` : '', record.winCount !== null && record.winCount !== undefined ? `${record.winCount}${t('winsUnit')}` : '', prize, member ? member.name_ja : '', record.isPublic ? t('publicBadge') : t('privateBadge')].filter(Boolean).map((item) => `<span>${escapeHtml(item)}</span>`).join('');
+    const meta = [record.spinCount !== null && record.spinCount !== undefined ? `${record.spinCount}${t('spinsUnit')} / ${formatYen(record.costTotal || 0)}` : '', record.winCount !== null && record.winCount !== undefined ? `${record.winCount}${t('winsUnit')}` : '', prize, member ? member.name_ja : '', record.isPublic ? t('publicBadge') : t('privateBadge'), record.cloudRecordId ? t('cloudBadge') : ''].filter(Boolean).map((item) => `<span${item === t('cloudBadge') ? ' class="cloud-record-badge"' : ''}>${escapeHtml(item)}</span>`).join('');
     return `<article class="record-item" data-id="${escapeHtml(record.id)}"><div class="record-main"><h3 class="record-title">${escapeHtml(title)}</h3><div class="record-meta">${meta}</div></div><div class="record-buttons"><button type="button" data-action="edit">${t('edit')}</button><button type="button" data-action="duplicate">${t('duplicate')}</button><button type="button" data-action="download">${t('download')}</button><button type="button" class="delete" data-action="delete">${t('delete')}</button></div></article>`;
   }).join('');
 }
 function escapeHtml(value) { return String(value).replace(/[&<>'"]/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[char])); }
 function handleRecordListClick(event) { const button = event.target.closest('button[data-action]'); if (!button) return; const item = button.closest('.record-item'); const record = appState.records.find((entry) => entry.id === item?.dataset.id); if (!record) return; const action = button.dataset.action; if (action === 'edit') { fillForm(record); switchTab('input'); window.scrollTo({ top: 0, behavior: 'smooth' }); } if (action === 'duplicate') { const cloned = { ...record, id: generateId(), createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() }; appState.records.unshift(cloned); persistRecords(); renderRecords(); renderPublicStats(); toast(t('saved')); } if (action === 'download') downloadRecordCard(record); if (action === 'delete') deleteRecord(record.id); }
-async function deleteRecord(id) { if (!confirm(t('confirmDelete'))) return; appState.records = appState.records.filter((record) => record.id !== id); persistRecords(); await backendAdapter.deleteRecord(id); renderRecords(); renderPublicStats(); if (els.editingId.value === id) resetForm(); }
+async function deleteRecord(id) { if (!confirm(t('confirmDelete'))) return; const removedRecord = appState.records.find((record) => record.id === id); appState.records = appState.records.filter((record) => record.id !== id); persistRecords(); try { await backendAdapter.deleteRecord(removedRecord); } catch (error) { console.warn('Garapon cloud delete failed', error); setCloudMessage(error.message || t('cloudFailed')); } renderRecords(); await refreshCloudPublicStats(); renderPublicStats(); if (els.editingId.value === id) resetForm(); }
 function deleteAllRecords() { if (!appState.records.length) return; if (!confirm(t('confirmDeleteAll'))) return; appState.records = []; persistRecords(); resetForm(); renderRecords(); renderPublicStats(); }
 function exportJson() { const payload = { app: 'gomensensei-garapon-challenge-log', exportedAt: new Date().toISOString(), records: appState.records }; const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' }); const url = URL.createObjectURL(blob); const link = document.createElement('a'); link.href = url; link.download = `garapon-records-${new Date().toISOString().slice(0, 10)}.json`; link.click(); URL.revokeObjectURL(url); }
 function importJson(event) { const file = event.target.files?.[0]; if (!file) return; const reader = new FileReader(); reader.onload = () => { try { const parsed = JSON.parse(String(reader.result || '{}')); const incoming = Array.isArray(parsed) ? parsed : parsed.records; if (!Array.isArray(incoming)) throw new Error('Invalid JSON'); const normalized = incoming.map((record) => ({ ...record, id: record.id || generateId(), schemaVersion: 2 })); const existingIds = new Set(appState.records.map((record) => record.id)); normalized.forEach((record) => { if (existingIds.has(record.id)) record.id = generateId(); }); appState.records = [...normalized, ...appState.records]; persistRecords(); renderRecords(); renderPublicStats(); toast(t('imported')); } catch { toast(t('importFailed')); } finally { event.target.value = ''; } }; reader.readAsText(file); }
-function switchTab(name) { $$('.tab-button').forEach((button) => button.classList.toggle('active', button.dataset.tab === name)); $$('.tab-panel').forEach((panel) => panel.classList.toggle('active', panel.id === `tab-${name}`)); if (name === 'public') renderPublicStats(); if (name === 'simulator') renderSimulator(); }
+function switchTab(name) { $$('.tab-button').forEach((button) => button.classList.toggle('active', button.dataset.tab === name)); $$('.tab-panel').forEach((panel) => panel.classList.toggle('active', panel.id === `tab-${name}`)); if (name === 'public') { renderPublicStats(); refreshCloudPublicStats(); } if (name === 'simulator') renderSimulator(); }
 
-function getPublicRecords() { return appState.records.filter((record) => record.isPublic); }
+function getPublicRecords() { return appState.cloudStatsLoaded ? appState.cloudPublicRecords : appState.records.filter((record) => record.isPublic); }
+function isUsingCloudPublicStats() { return Boolean(appState.cloudStatsLoaded); }
 function countBy(list, keyFn) { return list.reduce((acc, item) => { const key = keyFn(item); acc[key] = (acc[key] || 0) + 1; return acc; }, {}); }
 function groupSum(list, keyFn, valueFn) { return list.reduce((acc, item) => { const key = keyFn(item); acc[key] = (acc[key] || 0) + valueFn(item); return acc; }, {}); }
 
@@ -384,6 +628,8 @@ function renderPublicStats() {
   if (!els.kpiGrid) return;
   const chartGrid = document.querySelector('.chart-grid');
   const rankingGrid = document.querySelector('.ranking-grid');
+  const usingCloudStats = isUsingCloudPublicStats();
+  if (els.publicSourceNote) els.publicSourceNote.textContent = usingCloudStats ? t('publicCloudSource') : t('publicLocalSource');
   if (!publicRecords.length) {
     els.kpiGrid.innerHTML = `<div class="record-empty" style="grid-column:1/-1">${t('noPublicRecords')}</div>`;
     if (chartGrid) chartGrid.style.display = 'none';
@@ -392,11 +638,24 @@ function renderPublicStats() {
     [els.memberHeatmap, els.memberRanking, els.performanceRanking, els.winRateRanking, els.roiRanking].forEach((node) => { if (node) node.innerHTML = `<div class="ranking-empty">${t('noPublicRecords')}</div>`; });
     return;
   }
-  if (chartGrid) chartGrid.style.display = '';
-  if (rankingGrid) rankingGrid.style.display = '';
+  const visibility = usingCloudStats ? getStatsVisibility(publicRecords.length) : 'detailed';
   const summary = summarizePublic(publicRecords);
-  const kpis = [[t('people'), summary.peopleCount.toLocaleString()], [t('records'), summary.recordCount.toLocaleString()], [t('lotteryBalls'), summary.spinTotal.toLocaleString()], [t('cost'), formatYen(summary.costTotal)], [t('wins'), summary.winTotal.toLocaleString()], [t('winRate'), formatPercent(summary.winRate)], [t('avgSpend'), formatYen(summary.avgSpend)]];
+  if (visibility === 'hidden') {
+    els.kpiGrid.innerHTML = `<div class="record-empty public-threshold-note">${t('publicNotEnough')}</div>`;
+    if (chartGrid) chartGrid.style.display = 'none';
+    if (rankingGrid) rankingGrid.style.display = 'none';
+    [els.pieCanvas, els.barCanvas, els.radarCanvas, els.winRateCanvas, els.timelineCanvas].forEach(clearChart);
+    return;
+  }
+  if (chartGrid) chartGrid.style.display = visibility === 'detailed' ? '' : 'none';
+  if (rankingGrid) rankingGrid.style.display = visibility === 'detailed' ? '' : 'none';
+  const allKpis = [[t('people'), summary.peopleCount.toLocaleString()], [t('records'), summary.recordCount.toLocaleString()], [t('lotteryBalls'), summary.spinTotal.toLocaleString()], [t('cost'), formatYen(summary.costTotal)], [t('wins'), summary.winTotal.toLocaleString()], [t('winRate'), formatPercent(summary.winRate)], [t('avgSpend'), formatYen(summary.avgSpend)]];
+  const kpis = visibility === 'coarse' ? allKpis.slice(1, 6) : allKpis;
   els.kpiGrid.innerHTML = kpis.map(([label, value]) => `<div class="kpi-card"><small>${escapeHtml(label)}</small><strong>${escapeHtml(value)}</strong></div>`).join('');
+  if (visibility !== 'detailed') {
+    [els.pieCanvas, els.barCanvas, els.radarCanvas, els.winRateCanvas, els.timelineCanvas].forEach(clearChart);
+    return;
+  }
   drawPieChart(els.pieCanvas, Object.entries(summary.prizeCounts).map(([id, count]) => ({ label: id === 'none' ? t('noPrize') : getPrizeLabel(id), value: count })));
   drawBarChart(els.barCanvas, Object.entries(summary.performanceSpins).map(([id, count]) => ({ label: id === 'none' ? t('noPerformance') : getPerformance(id)?.label || id, value: count })));
   drawRadarChart(els.radarCanvas, [{ label: t('people'), value: summary.peopleCount, max: Math.max(summary.peopleCount, 10) }, { label: t('records'), value: summary.recordCount, max: Math.max(summary.recordCount, 10) }, { label: t('lotteryBalls'), value: summary.spinTotal, max: Math.max(summary.spinTotal, 50) }, { label: t('cost'), value: summary.costTotal / 500, max: Math.max(summary.costTotal / 500, 50) }, { label: t('wins'), value: summary.winTotal, max: Math.max(summary.winTotal, 10) }, { label: t('winRate'), value: Number.isFinite(summary.winRate) ? summary.winRate : 0, max: 100 }]);
@@ -605,8 +864,27 @@ function bindSimulatorEvents() {
   els.resetSimulatorBtn?.addEventListener('click', resetSimulator);
 }
 
+function renderCloudPanel() {
+  const configured = Boolean(window.Tool48Supabase?.isConfigured?.());
+  const user = getAuthUser();
+  if (!configured) setCloudMessage(t('cloudUnconfigured'));
+  else if (user) setCloudMessage(t('cloudReady'));
+  else setCloudMessage(t('cloudLoginRequired'));
+  window.Tool48Auth?.renderAuthState?.();
+}
+
+function bindCloudEvents() {
+  els.syncLocalBtn?.addEventListener('click', syncLocalRecordsToCloud);
+  els.loadCloudBtn?.addEventListener('click', loadCloudRecords);
+  window.Tool48Auth?.onAuthStateChange?.((session) => {
+    appState.session = session;
+    renderCloudPanel();
+  });
+  renderCloudPanel();
+}
+
 async function loadMembers() { try { const response = await fetch('members.json', { cache: 'no-store' }); if (!response.ok) throw new Error('members.json not found'); appState.members = await response.json(); if (typeof initSilentPreloader === 'function') initSilentPreloader(appState.members, 'image', 'imgLoaded'); } catch { appState.members = []; } }
-function bindEvents() { els.languageSelect.addEventListener('change', () => { appState.lang = els.languageSelect.value; localStorage.setItem(GARAPON_CONFIG.languageKey, appState.lang); applyLanguage(); }); $$('.tab-button').forEach((button) => button.addEventListener('click', () => switchTab(button.dataset.tab))); els.recordForm.addEventListener('submit', saveFormRecord); ['input', 'change'].forEach((eventName) => { [els.nameInput, els.dateInput, els.performanceSelect, els.spinCountInput, els.winCountInput, els.prizeSelect, els.memberSelect, els.publicConsentInput].forEach((node) => node.addEventListener(eventName, debounce(renderPreviewFromForm, 60))); }); els.clearFormBtn.addEventListener('click', resetForm); els.downloadCurrentBtn.addEventListener('click', () => downloadRecordCard(collectFormRecord({ keepId: false }))); els.recordList.addEventListener('click', handleRecordListClick); els.exportJsonBtn.addEventListener('click', exportJson); els.importJsonInput.addEventListener('change', importJson); els.deleteAllBtn.addEventListener('click', deleteAllRecords); els.closeDialogBtn.addEventListener('click', () => els.imageDialog.close()); bindSimulatorEvents(); window.addEventListener('resize', debounce(() => { renderPreviewFromForm(); renderPublicStats(); }, 180)); }
+function bindEvents() { els.languageSelect.addEventListener('change', () => { appState.lang = els.languageSelect.value; localStorage.setItem(GARAPON_CONFIG.languageKey, appState.lang); applyLanguage(); }); $$('.tab-button').forEach((button) => button.addEventListener('click', () => switchTab(button.dataset.tab))); els.recordForm.addEventListener('submit', saveFormRecord); ['input', 'change'].forEach((eventName) => { [els.nameInput, els.dateInput, els.performanceSelect, els.spinCountInput, els.winCountInput, els.prizeSelect, els.memberSelect, els.publicConsentInput].forEach((node) => node.addEventListener(eventName, debounce(renderPreviewFromForm, 60))); }); els.clearFormBtn.addEventListener('click', resetForm); els.downloadCurrentBtn.addEventListener('click', () => downloadRecordCard(collectFormRecord({ keepId: false }))); els.recordList.addEventListener('click', handleRecordListClick); els.exportJsonBtn.addEventListener('click', exportJson); els.importJsonInput.addEventListener('change', importJson); els.deleteAllBtn.addEventListener('click', deleteAllRecords); els.closeDialogBtn.addEventListener('click', () => els.imageDialog.close()); bindSimulatorEvents(); bindCloudEvents(); window.addEventListener('resize', debounce(() => { renderPreviewFromForm(); renderPublicStats(); }, 180)); }
 async function init() { appState.lang = detectLanguage(); loadRecords(); loadSimulatorState(); populatePerformanceOptions(); await loadMembers(); populateMemberOptions(); bindEvents(); applyLanguage(); updateCost(); renderRecords(); renderPublicStats(); renderSimulator(); renderPreviewFromForm(); }
 
 document.addEventListener('DOMContentLoaded', init);
