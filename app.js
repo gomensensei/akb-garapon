@@ -187,6 +187,9 @@ const CLOUD_I18N = {
   cloudFailed: 'Cloud action failed. Local records were not changed.',
   cloudNoRecords: 'No local records to sync.',
   cloudBadge: 'Cloud',
+  accountNavGuest: 'Account',
+  cloudAutoSaving: 'Saving to cloud...',
+  cloudAutoSaved: 'Saved to cloud.',
   publicCloudSource: 'Showing approved anonymous cloud submissions only.',
   publicLocalSource: 'Currently calculated only from local records marked as public-ready.',
   publicNotEnough: 'Not enough anonymous public data yet. Detailed breakdowns appear from 10 approved records.',
@@ -360,15 +363,21 @@ Object.assign(I18N.id, {
   publicLocalSource: 'Saat ini dihitung hanya dari catatan lokal yang ditandai public-ready.',
   publicNotEnough: 'Data publik anonim belum cukup. Detail muncul mulai dari 10 catatan approved.'
 });
+Object.assign(I18N['zh-Hant'], { accountNavGuest: '帳號', cloudAutoSaving: '保存到雲端中...', cloudAutoSaved: '已保存到雲端。' });
+Object.assign(I18N['zh-Hans'], { accountNavGuest: '账号', cloudAutoSaving: '保存到云端中...', cloudAutoSaved: '已保存到云端。' });
+Object.assign(I18N.ja, { accountNavGuest: 'アカウント', cloudAutoSaving: 'クラウドに保存中...', cloudAutoSaved: 'クラウドに保存しました。' });
+Object.assign(I18N.ko, { accountNavGuest: '계정', cloudAutoSaving: '클라우드에 저장 중...', cloudAutoSaved: '클라우드에 저장했습니다.' });
+Object.assign(I18N.th, { accountNavGuest: 'บัญชี', cloudAutoSaving: 'กำลังบันทึกบนคลาวด์...', cloudAutoSaved: 'บันทึกบนคลาวด์แล้ว' });
+Object.assign(I18N.id, { accountNavGuest: 'Akun', cloudAutoSaving: 'Menyimpan ke cloud...', cloudAutoSaved: 'Tersimpan ke cloud.' });
 
-let appState = { lang: 'ja', members: [], records: [], simulator: null, session: null, cloudPublicRecords: [], cloudStatsLoaded: false };
+let appState = { lang: 'ja', members: [], records: [], simulator: null, session: null, cloudPublicRecords: [], cloudStatsLoaded: false, lastCloudLoadUserId: '' };
 let simulatorRuntime = { dragging: false, angle: 0, lastAngle: 0, lastTime: 0, accumulatedSlowDelta: 0, smoothedSpeed: 0, lastDropAt: 0, lastFastNoticeAt: 0 };
 
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => Array.from(document.querySelectorAll(selector));
 
 const els = {
-  languageSelect: $('#languageSelect'), recordForm: $('#recordForm'), editingId: $('#editingId'), nameInput: $('#nameInput'), dateInput: $('#dateInput'), performanceSelect: $('#performanceSelect'), spinCountInput: $('#spinCountInput'), costOutput: $('#costOutput'), winCountInput: $('#winCountInput'), prizeSelect: $('#prizeSelect'), memberSelect: $('#memberSelect'), publicConsentInput: $('#publicConsentInput'), clearFormBtn: $('#clearFormBtn'), downloadCurrentBtn: $('#downloadCurrentBtn'), previewCanvas: $('#previewCanvas'), recordList: $('#recordList'), exportJsonBtn: $('#exportJsonBtn'), importJsonInput: $('#importJsonInput'), deleteAllBtn: $('#deleteAllBtn'), kpiGrid: $('#kpiGrid'), pieCanvas: $('#pieCanvas'), barCanvas: $('#barCanvas'), radarCanvas: $('#radarCanvas'), winRateCanvas: $('#winRateCanvas'), timelineCanvas: $('#timelineCanvas'), memberHeatmap: $('#memberHeatmap'), memberRanking: $('#memberRanking'), performanceRanking: $('#performanceRanking'), winRateRanking: $('#winRateRanking'), roiRanking: $('#roiRanking'), imageDialog: $('#imageDialog'), dialogImage: $('#dialogImage'), closeDialogBtn: $('#closeDialogBtn'), garaponMachine: $('#garaponMachine'), garaponDrum: $('#garaponDrum'), garaponHandle: $('#garaponHandle'), lastBall: $('#lastBall'), simHint: $('#simHint'), simTotalTurns: $('#simTotalTurns'), simWinRate: $('#simWinRate'), resetSimulatorBtn: $('#resetSimulatorBtn'), simRecordList: $('#simRecordList'), cloudPanel: $('#cloudPanel'), cloudStatus: $('#cloudStatus'), cloudMessage: $('#cloudMessage'), syncLocalBtn: $('#syncLocalBtn'), loadCloudBtn: $('#loadCloudBtn'), publicSourceNote: $('#publicSourceNote')
+  languageSelect: $('#languageSelect'), accountNavLink: $('#accountNavLink'), recordForm: $('#recordForm'), editingId: $('#editingId'), nameInput: $('#nameInput'), dateInput: $('#dateInput'), performanceSelect: $('#performanceSelect'), spinCountInput: $('#spinCountInput'), costOutput: $('#costOutput'), winCountInput: $('#winCountInput'), prizeSelect: $('#prizeSelect'), memberSelect: $('#memberSelect'), publicConsentInput: $('#publicConsentInput'), clearFormBtn: $('#clearFormBtn'), downloadCurrentBtn: $('#downloadCurrentBtn'), previewCanvas: $('#previewCanvas'), recordList: $('#recordList'), exportJsonBtn: $('#exportJsonBtn'), importJsonInput: $('#importJsonInput'), deleteAllBtn: $('#deleteAllBtn'), kpiGrid: $('#kpiGrid'), pieCanvas: $('#pieCanvas'), barCanvas: $('#barCanvas'), radarCanvas: $('#radarCanvas'), winRateCanvas: $('#winRateCanvas'), timelineCanvas: $('#timelineCanvas'), memberHeatmap: $('#memberHeatmap'), memberRanking: $('#memberRanking'), performanceRanking: $('#performanceRanking'), winRateRanking: $('#winRateRanking'), roiRanking: $('#roiRanking'), imageDialog: $('#imageDialog'), dialogImage: $('#dialogImage'), closeDialogBtn: $('#closeDialogBtn'), garaponMachine: $('#garaponMachine'), garaponDrum: $('#garaponDrum'), garaponHandle: $('#garaponHandle'), lastBall: $('#lastBall'), simHint: $('#simHint'), simTotalTurns: $('#simTotalTurns'), simWinRate: $('#simWinRate'), resetSimulatorBtn: $('#resetSimulatorBtn'), simRecordList: $('#simRecordList'), cloudPanel: $('#cloudPanel'), cloudStatus: $('#cloudStatus'), cloudMessage: $('#cloudMessage'), syncLocalBtn: $('#syncLocalBtn'), loadCloudBtn: $('#loadCloudBtn'), publicSourceNote: $('#publicSourceNote')
 };
 
 // Future backend adapter reservation.
@@ -397,6 +406,18 @@ function getSupabaseClient() {
 
 function getAuthUser() {
   return window.Tool48Auth?.getUser ? window.Tool48Auth.getUser() : null;
+}
+
+function getAuthDisplayName() {
+  const user = getAuthUser();
+  return user?.user_metadata?.display_name || user?.email || '';
+}
+
+function renderAccountNav() {
+  if (!els.accountNavLink) return;
+  const label = getAuthDisplayName() || t('accountNavGuest');
+  els.accountNavLink.textContent = label;
+  els.accountNavLink.title = label;
 }
 
 function setCloudMessage(message) {
@@ -546,8 +567,9 @@ async function syncLocalRecordsToCloud() {
   }
 }
 
-async function loadCloudRecords() {
-  setCloudMessage(t('cloudLoading'));
+async function loadCloudRecords(options = {}) {
+  const silent = Boolean(options.silent);
+  if (!silent) setCloudMessage(t('cloudLoading'));
   try {
     const client = getSupabaseClient();
     const user = getAuthUser();
@@ -558,9 +580,11 @@ async function loadCloudRecords() {
     if (error) throw error;
     const incoming = (data || []).map(fromDbRecord);
     const byCloudId = new Map(appState.records.filter((record) => record.cloudRecordId).map((record) => [record.cloudRecordId, record]));
+    const bySignature = new Map(appState.records.map((record) => [getRecordSignature(record), record]));
     incoming.forEach((record) => {
       const existing = byCloudId.get(record.cloudRecordId);
       if (existing) Object.assign(existing, record, { id: existing.id });
+      else if (bySignature.has(getRecordSignature(record))) Object.assign(bySignature.get(getRecordSignature(record)), record, { id: bySignature.get(getRecordSignature(record)).id });
       else appState.records.unshift(record);
     });
     persistRecords();
@@ -627,7 +651,7 @@ function applyLanguage() {
   els.languageSelect.value = appState.lang;
   $$('[data-i18n]').forEach((node) => { node.textContent = t(node.dataset.i18n); });
   $$('[data-i18n-placeholder]').forEach((node) => { node.placeholder = t(node.dataset.i18nPlaceholder); });
-  populatePrizeOptions(); populateMemberOptions(); renderPreviewFromForm(); renderRecords(); renderPublicStats(); renderSimulator(); updateSubmitButtonLabel();
+  populatePrizeOptions(); populateMemberOptions(); renderAccountNav(); renderPreviewFromForm(); renderRecords(); renderPublicStats(); renderSimulator(); updateSubmitButtonLabel();
 }
 
 function normalizeName(value) { return String(value || '').replace(/\s+/g, '').trim(); }
@@ -663,7 +687,7 @@ function collectFormRecord({ keepId = true } = {}) {
   const now = new Date().toISOString();
   const editingId = els.editingId.value;
   const oldRecord = editingId ? appState.records.find((record) => record.id === editingId) : null;
-  return { id: keepId && editingId ? editingId : generateId(), name: els.nameInput.value.trim(), date: els.dateInput.value, performanceId: els.performanceSelect.value, spinCount, costTotal: spinCount === null ? null : spinCount * GARAPON_CONFIG.yenPerSpin, winCount, prizeId: els.prizeSelect.value, twoShotMemberId: els.memberSelect.value, isPublic: els.publicConsentInput.checked, createdAt: oldRecord?.createdAt || now, updatedAt: now, schemaVersion: 2 };
+  return { id: keepId && editingId ? editingId : generateId(), cloudRecordId: oldRecord?.cloudRecordId || null, name: els.nameInput.value.trim(), date: els.dateInput.value, performanceId: els.performanceSelect.value, spinCount, costTotal: spinCount === null ? null : spinCount * GARAPON_CONFIG.yenPerSpin, winCount, prizeId: els.prizeSelect.value, twoShotMemberId: els.memberSelect.value, isPublic: els.publicConsentInput.checked, createdAt: oldRecord?.createdAt || now, updatedAt: now, schemaVersion: 2 };
 }
 
 function fillForm(record) { els.editingId.value = record.id || ''; els.nameInput.value = record.name || ''; els.dateInput.value = record.date || ''; els.performanceSelect.value = record.performanceId || ''; els.spinCountInput.value = record.spinCount ?? ''; els.winCountInput.value = record.winCount ?? ''; els.prizeSelect.value = record.prizeId || ''; els.memberSelect.value = record.twoShotMemberId || ''; els.publicConsentInput.checked = Boolean(record.isPublic); updateCost(); renderPreview(record); updateSubmitButtonLabel(); }
@@ -676,6 +700,18 @@ async function saveFormRecord(event) {
   const existingIndex = appState.records.findIndex((item) => item.id === record.id);
   if (existingIndex >= 0) { appState.records[existingIndex] = record; toast(t('updated')); } else { appState.records.unshift(record); toast(t('saved')); }
   persistRecords(); await backendAdapter.saveRecord(record);
+  if (getSupabaseClient() && getAuthUser()) {
+    setCloudMessage(t('cloudAutoSaving'));
+    try {
+      await saveRecordToCloud(record);
+      persistRecords();
+      await refreshCloudPublicStats();
+      setCloudMessage(t('cloudAutoSaved'));
+    } catch (error) {
+      console.warn('Garapon cloud save failed', error);
+      setCloudMessage(error.message || t('cloudFailed'));
+    }
+  }
   renderRecords(); renderPublicStats(); renderPreview(record); updateSubmitButtonLabel();
 }
 
@@ -1040,6 +1076,7 @@ function bindSimulatorEvents() {
 function renderCloudPanel() {
   const configured = Boolean(window.Tool48Supabase?.isConfigured?.());
   const user = getAuthUser();
+  renderAccountNav();
   if (!configured) setCloudMessage(t('cloudUnconfigured'));
   else if (user) setCloudMessage(t('cloudReady'));
   else setCloudMessage(t('cloudLoginRequired'));
@@ -1051,7 +1088,14 @@ function bindCloudEvents() {
   els.loadCloudBtn?.addEventListener('click', loadCloudRecords);
   window.Tool48Auth?.onAuthStateChange?.((session) => {
     appState.session = session;
+    const userId = session?.user?.id || '';
     renderCloudPanel();
+    if (userId && appState.lastCloudLoadUserId !== userId) {
+      appState.lastCloudLoadUserId = userId;
+      loadCloudRecords({ silent: true });
+      refreshCloudPublicStats();
+    }
+    if (!userId) appState.lastCloudLoadUserId = '';
   });
   renderCloudPanel();
 }
