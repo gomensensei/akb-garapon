@@ -535,6 +535,20 @@ const ACCOUNT_POPOVER_I18N = {
 };
 Object.entries(ACCOUNT_POPOVER_I18N).forEach(([lang, values]) => Object.assign(I18N[lang], values));
 
+const TOOL48_FOOTER_I18N = {
+  en: 'This unofficial fan site is created by fan Gomen Sensei (gomensensei). Images and related materials are © AKB48 and DH Co., Ltd.',
+  'zh-Hant': '本非官方粉絲網站由粉絲 Gomen Sensei (gomensensei) 製作。圖片及相關素材版權屬於 AKB48 與 DH Co., Ltd.',
+  'zh-Hans': '本非官方粉丝网站由粉丝 Gomen Sensei (gomensensei) 制作。图片及相关素材版权属于 AKB48 与 DH Co., Ltd.',
+  ja: 'この非公式ファンサイトは、ファンの Gomen Sensei (gomensensei) が制作しています。画像および関連素材の権利は AKB48 と DH Co., Ltd. に帰属します。',
+  ko: '이 비공식 팬 사이트는 팬 Gomen Sensei (gomensensei)가 제작했습니다. 이미지 및 관련 자료의 권리는 AKB48 및 DH Co., Ltd.에 있습니다.',
+  th: 'เว็บไซต์แฟนไซต์ไม่เป็นทางการนี้จัดทำโดยแฟน Gomen Sensei (gomensensei) รูปภาพและสื่อที่เกี่ยวข้องเป็นลิขสิทธิ์ของ AKB48 และ DH Co., Ltd.',
+  id: 'Situs penggemar tidak resmi ini dibuat oleh fan Gomen Sensei (gomensensei). Gambar dan materi terkait adalah milik AKB48 dan DH Co., Ltd.'
+};
+
+Object.entries(TOOL48_FOOTER_I18N).forEach(([lang, siteDisclaimer]) => {
+  if (I18N[lang]) I18N[lang].siteDisclaimer = siteDisclaimer;
+});
+
 let appState = { lang: 'ja', members: [], records: [], simulator: null, session: null, cloudPublicRecords: [], cloudStatsLoaded: false, lastCloudLoadUserId: '' };
 let simulatorRuntime = { dragging: false, angle: 0, lastAngle: 0, lastTime: 0, accumulatedSlowDelta: 0, smoothedSpeed: 0, lastDropAt: 0, lastFastNoticeAt: 0 };
 
@@ -852,6 +866,7 @@ function getPerformance(id) { return PERFORMANCES.find((item) => item.id === id)
 function getPrize(id) { return PRIZES.find((item) => item.id === id) || PRIZES[0]; }
 function getPrizeLabel(id, preferJapanese = false) { if (!id) return ''; if (preferJapanese) return getPrize(id).labelJa; if (id === 'twoShot') return t('twoShot'); if (id === 'sendOff') return t('sendOff'); return getPrize(id).labelJa || id; }
 function getMember(id) { return appState.members.find((member) => String(member.id) === String(id)) || null; }
+function isSelectableMember(member) { return Boolean(member) && member.active !== false && member.selectable !== false && member.hiddenFromSelection !== true; }
 function getMemberDisplay(member) { if (!member) return ''; if (appState.lang === 'en' && member.name_en) return `${member.name_en} / ${member.name_ja}`; if (appState.lang === 'ko' && member.name_ko) return `${member.name_ko} / ${member.name_ja}`; return member.nickname ? `${member.name_ja}（${member.nickname}）` : member.name_ja; }
 function generateId() { return globalThis.crypto?.randomUUID ? globalThis.crypto.randomUUID() : `rec_${Date.now()}_${Math.random().toString(16).slice(2)}`; }
 
@@ -866,7 +881,7 @@ function persistRecords() { localStorage.setItem(GARAPON_CONFIG.storageKey, JSON
 
 function populatePerformanceOptions() { els.performanceSelect.innerHTML = ''; els.performanceSelect.append(new Option(t('selectPlaceholder'), '')); PERFORMANCES.forEach((item) => els.performanceSelect.append(new Option(item.label, item.id))); }
 function populatePrizeOptions() { const current = els.prizeSelect.value; els.prizeSelect.innerHTML = ''; els.prizeSelect.append(new Option(t('selectPlaceholder'), '')); PRIZES.filter((item) => item.id).forEach((item) => els.prizeSelect.append(new Option(getPrizeLabel(item.id), item.id))); els.prizeSelect.value = current; }
-function populateMemberOptions() { const current = els.memberSelect.value; els.memberSelect.innerHTML = ''; els.memberSelect.append(new Option(t('memberPlaceholder'), '')); appState.members.forEach((member) => els.memberSelect.append(new Option(getMemberDisplay(member), String(member.id)))); els.memberSelect.value = current; }
+function populateMemberOptions() { const current = els.memberSelect.value; els.memberSelect.innerHTML = ''; els.memberSelect.append(new Option(t('memberPlaceholder'), '')); appState.members.filter(isSelectableMember).forEach((member) => els.memberSelect.append(new Option(getMemberDisplay(member), String(member.id)))); els.memberSelect.value = current; }
 function updateCost() { const spins = parseOptionalInt(els.spinCountInput.value) || 0; els.costOutput.value = formatYen(spins * GARAPON_CONFIG.yenPerSpin); els.costOutput.textContent = formatYen(spins * GARAPON_CONFIG.yenPerSpin); }
 
 function collectFormRecord({ keepId = true } = {}) {

@@ -397,6 +397,33 @@ button, .file-button {
   gap: 12px;
 }
 
+.account-link {
+  gap: 6px;
+  min-height: 38px;
+  padding: 0 12px;
+  border-radius: 999px;
+}
+
+.account-link::before {
+  content: "T48";
+  flex-shrink: 0;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: rgba(255,79,154,0.14);
+  color: var(--pink-strong);
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0;
+}
+
+.account-popover.cloud-panel {
+  margin: 0;
+  background: rgba(255,255,255,0.96);
+  border-color: rgba(255,255,255,0.86);
+  z-index: 260;
+  box-shadow: 0 24px 76px rgba(31, 41, 55, 0.22), inset 0 1px 0 rgba(255,255,255,0.82);
+}
+
 .cloud-copy h3 {
   margin: 4px 0;
   font-size: 18px;
@@ -583,8 +610,9 @@ button, .file-button {
   .brand-mark { width: 38px; height: 38px; border-radius: 14px; }
   .topbar-actions { gap: 6px; max-width: 58%; }
   .language-select { max-width: 112px; padding-left: 10px; padding-right: 26px; font-size: 12px; }
-  .account-link { max-width: 86px; min-height: 38px; padding: 0 10px; font-size: 12px; }
-  .account-popover { position: fixed; top: 70px; right: 11px; left: 11px; width: auto; max-height: calc(100dvh - 86px); }
+  .account-link { max-width: min(132px, 36vw); min-height: 38px; padding: 0 10px; font-size: 12px; }
+  .account-link::before { padding-inline: 5px; font-size: 9px; }
+  .account-popover { position: fixed; top: 70px; right: 11px; left: 11px; width: auto; max-height: calc(100dvh - 86px); overflow: auto; }
   .account-popover .cloud-login-form,
   .account-popover .cloud-actions { display: grid; grid-template-columns: 1fr; align-items: stretch; }
   .account-popover .cloud-email-field { min-width: 0; }
