@@ -35,7 +35,38 @@
         <option value="th">ไทย</option>
         <option value="id">Indonesia</option>
       </select>
-      <a id="accountNavLink" class="ghost-button account-link" href="account.html" data-i18n="accountNavGuest">Account</a>
+      <div class="account-popover-shell">
+        <button type="button" id="accountToggleBtn" class="ghost-button account-link" aria-expanded="false" aria-controls="accountPopover" data-i18n="accountNavGuest">Account</button>
+        <section id="accountPopover" class="cloud-panel account-popover" aria-live="polite" hidden>
+          <div class="cloud-copy">
+            <p class="eyebrow" data-i18n="cloudEyebrow">Optional Cloud Save</p>
+            <h3 data-i18n="cloudTitle">Account sync</h3>
+            <p id="cloudStatus" class="server-note" data-tool48-auth-status data-i18n="cloudChecking">Checking account status...</p>
+          </div>
+          <form id="cloudLoginForm" class="cloud-login-form" data-tool48-login-form data-tool48-auth-logged-out>
+            <label class="field cloud-email-field">
+              <span data-i18n="cloudNicknameLabel">Nickname</span>
+              <input type="text" autocomplete="nickname" placeholder="gomensensei" data-tool48-nickname data-i18n-placeholder="cloudNicknamePlaceholder" />
+            </label>
+            <label class="field cloud-email-field">
+              <span data-i18n="cloudEmailLabel">Account email</span>
+              <input type="email" autocomplete="email" required placeholder="you@example.com" data-tool48-email />
+            </label>
+            <label class="field cloud-email-field">
+              <span data-i18n="cloudPasswordLabel">Password</span>
+              <input type="password" autocomplete="current-password" required minlength="6" placeholder="6+ characters" data-tool48-password data-i18n-placeholder="cloudPasswordPlaceholder" />
+            </label>
+            <button type="submit" class="primary-button hover-glow" data-tool48-auth-action="signin" data-i18n="cloudSignIn">Sign in</button>
+            <button type="submit" class="secondary-button hover-glow" data-tool48-auth-action="signup" data-i18n="cloudCreateAccount">Create account</button>
+            <p class="server-note" data-tool48-auth-message></p>
+          </form>
+          <div id="cloudActions" class="cloud-actions" data-tool48-auth-logged-in>
+            <button type="button" class="ghost-button" data-tool48-sign-out data-i18n="cloudSignOut">Sign out</button>
+          </div>
+          <p id="cloudMessage" class="server-note"></p>
+          <p class="server-note" data-tool48-auth-unconfigured data-i18n="cloudUnconfigured">Cloud save is not configured. Local records still work.</p>
+        </section>
+      </div>
     </div>
   </header>
 
@@ -208,35 +239,6 @@
             <button type="button" id="deleteAllBtn" class="danger-button" data-i18n="deleteAll">全削除</button>
           </div>
         </div>
-        <section id="cloudPanel" class="cloud-panel" aria-live="polite">
-          <div class="cloud-copy">
-            <p class="eyebrow" data-i18n="cloudEyebrow">Optional Cloud Save</p>
-            <h3 data-i18n="cloudTitle">Account sync</h3>
-            <p id="cloudStatus" class="server-note" data-tool48-auth-status data-i18n="cloudChecking">Checking account status...</p>
-          </div>
-          <form id="cloudLoginForm" class="cloud-login-form" data-tool48-login-form data-tool48-auth-logged-out>
-            <label class="field cloud-email-field">
-              <span data-i18n="cloudNicknameLabel">Nickname</span>
-              <input type="text" autocomplete="nickname" placeholder="gomensensei" data-tool48-nickname data-i18n-placeholder="cloudNicknamePlaceholder" />
-            </label>
-            <label class="field cloud-email-field">
-              <span data-i18n="cloudEmailLabel">Account email</span>
-              <input type="email" autocomplete="email" required placeholder="you@example.com" data-tool48-email />
-            </label>
-            <label class="field cloud-email-field">
-              <span data-i18n="cloudPasswordLabel">Password</span>
-              <input type="password" autocomplete="current-password" required minlength="6" placeholder="6+ characters" data-tool48-password data-i18n-placeholder="cloudPasswordPlaceholder" />
-            </label>
-            <button type="submit" class="primary-button hover-glow" data-tool48-auth-action="signin" data-i18n="cloudSignIn">Sign in</button>
-            <button type="submit" class="secondary-button hover-glow" data-tool48-auth-action="signup" data-i18n="cloudCreateAccount">Create account</button>
-            <p class="server-note" data-tool48-auth-message></p>
-          </form>
-          <div id="cloudActions" class="cloud-actions" data-tool48-auth-logged-in>
-            <button type="button" class="ghost-button" data-tool48-sign-out data-i18n="cloudSignOut">Sign out</button>
-          </div>
-          <p id="cloudMessage" class="server-note"></p>
-          <p class="server-note" data-tool48-auth-unconfigured data-i18n="cloudUnconfigured">Cloud save is not configured. Local records still work.</p>
-        </section>
         <div id="recordList" class="record-list"></div>
       </div>
     </section>

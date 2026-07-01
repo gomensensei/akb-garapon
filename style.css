@@ -351,6 +351,12 @@ button, .file-button {
 }
 .record-buttons .delete { color: #fff; background: #ef4444; }
 
+.account-popover-shell {
+  position: relative;
+  display: inline-flex;
+  min-width: 0;
+}
+
 .account-link {
   text-decoration: none;
   display: inline-flex;
@@ -360,6 +366,24 @@ button, .file-button {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.account-popover {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  width: min(390px, calc(100vw - 24px));
+  max-height: calc(100dvh - 100px);
+  overflow: auto;
+  z-index: 60;
+  margin: 0;
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  box-shadow: 0 22px 70px rgba(31, 41, 55, 0.18), inset 0 1px 0 rgba(255,255,255,0.78);
+}
+
+.account-popover[hidden] {
+  display: none !important;
 }
 
 .cloud-panel {
@@ -560,6 +584,10 @@ button, .file-button {
   .topbar-actions { gap: 6px; max-width: 58%; }
   .language-select { max-width: 112px; padding-left: 10px; padding-right: 26px; font-size: 12px; }
   .account-link { max-width: 86px; min-height: 38px; padding: 0 10px; font-size: 12px; }
+  .account-popover { position: fixed; top: 70px; right: 11px; left: 11px; width: auto; max-height: calc(100dvh - 86px); }
+  .account-popover .cloud-login-form,
+  .account-popover .cloud-actions { display: grid; grid-template-columns: 1fr; align-items: stretch; }
+  .account-popover .cloud-email-field { min-width: 0; }
   .app-shell { width: calc(100% - 22px); margin-top: 12px; }
   .hero { padding: 14px 16px; }
   .hero .eyebrow { margin-bottom: 6px; font-size: 11px; }

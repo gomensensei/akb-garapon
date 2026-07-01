@@ -370,6 +370,171 @@ Object.assign(I18N.ko, { accountNavGuest: '계정', cloudAutoSaving: '클라우�
 Object.assign(I18N.th, { accountNavGuest: 'บัญชี', cloudAutoSaving: 'กำลังบันทึกบนคลาวด์...', cloudAutoSaved: 'บันทึกบนคลาวด์แล้ว' });
 Object.assign(I18N.id, { accountNavGuest: 'Akun', cloudAutoSaving: 'Menyimpan ke cloud...', cloudAutoSaved: 'Tersimpan ke cloud.' });
 
+const ACCOUNT_POPOVER_I18N = {
+  en: {
+    accountNavGuest: 'Tool48 Account',
+    cloudEyebrow: 'Optional Cloud Save',
+    cloudTitle: 'Tool48 Account',
+    cloudChecking: 'Checking account status...',
+    cloudNicknameLabel: 'Nickname',
+    cloudNicknamePlaceholder: 'gomensensei',
+    cloudEmailLabel: 'Account email',
+    cloudPasswordLabel: 'Password',
+    cloudPasswordPlaceholder: '6+ characters',
+    cloudSignIn: 'Sign in',
+    cloudCreateAccount: 'Create account',
+    cloudSignOut: 'Sign out',
+    cloudUnconfigured: 'Cloud save is not configured. Local records still work.',
+    cloudLoginRequired: 'Login is optional. You can keep using local save without an account.',
+    cloudReady: 'Signed in. Records are saved locally first, then backed up to cloud automatically.',
+    cloudLoading: 'Loading cloud records...',
+    cloudLoaded: 'Loaded {count} cloud record(s).',
+    cloudFailed: 'Cloud action failed. Local records still work.',
+    cloudBadge: 'Cloud',
+    cloudAutoSaving: 'Saving to cloud...',
+    cloudAutoSaved: 'Saved to cloud.',
+  },
+  'zh-Hant': {
+    accountNavGuest: 'Tool48 帳號',
+    cloudEyebrow: '可選雲端保存',
+    cloudTitle: 'Tool48 帳號',
+    cloudChecking: '檢查登入狀態中...',
+    cloudNicknameLabel: 'Nickname',
+    cloudNicknamePlaceholder: '例如：gomensensei',
+    cloudEmailLabel: '帳號 email',
+    cloudPasswordLabel: '密碼',
+    cloudPasswordPlaceholder: '最少 6 個字',
+    cloudSignIn: '登入',
+    cloudCreateAccount: '建立帳號',
+    cloudSignOut: '登出',
+    cloudUnconfigured: '雲端保存尚未設定，本機紀錄仍然可用。',
+    cloudLoginRequired: '登入係可選；唔登入都可以照用本機保存。',
+    cloudReady: '已登入。紀錄會先保存喺本機，再自動備份到雲端。',
+    cloudLoading: '載入雲端紀錄中...',
+    cloudLoaded: '已載入 {count} 筆雲端紀錄。',
+    cloudFailed: '雲端操作失敗，本機紀錄仍然可用。',
+    cloudBadge: '雲端',
+    cloudAutoSaving: '保存到雲端中...',
+    cloudAutoSaved: '已保存到雲端。',
+  },
+  'zh-Hans': {
+    accountNavGuest: 'Tool48 账号',
+    cloudEyebrow: '可选云端保存',
+    cloudTitle: 'Tool48 账号',
+    cloudChecking: '检查登录状态中...',
+    cloudNicknameLabel: 'Nickname',
+    cloudNicknamePlaceholder: '例如：gomensensei',
+    cloudEmailLabel: '账号 email',
+    cloudPasswordLabel: '密码',
+    cloudPasswordPlaceholder: '至少 6 个字符',
+    cloudSignIn: '登录',
+    cloudCreateAccount: '建立账号',
+    cloudSignOut: '登出',
+    cloudUnconfigured: '云端保存尚未设置，本机记录仍然可用。',
+    cloudLoginRequired: '登录是可选的；不登录也可以继续使用本机保存。',
+    cloudReady: '已登录。记录会先保存在本机，再自动备份到云端。',
+    cloudLoading: '载入云端记录中...',
+    cloudLoaded: '已载入 {count} 笔云端记录。',
+    cloudFailed: '云端操作失败，本机记录仍然可用。',
+    cloudBadge: '云端',
+    cloudAutoSaving: '保存到云端中...',
+    cloudAutoSaved: '已保存到云端。',
+  },
+  ja: {
+    accountNavGuest: 'Tool48アカウント',
+    cloudEyebrow: '任意クラウド保存',
+    cloudTitle: 'Tool48アカウント',
+    cloudChecking: 'ログイン状態を確認中...',
+    cloudNicknameLabel: 'ニックネーム',
+    cloudNicknamePlaceholder: '例: gomensensei',
+    cloudEmailLabel: 'アカウント用メール',
+    cloudPasswordLabel: 'パスワード',
+    cloudPasswordPlaceholder: '6文字以上',
+    cloudSignIn: 'ログイン',
+    cloudCreateAccount: 'アカウント作成',
+    cloudSignOut: 'ログアウト',
+    cloudUnconfigured: 'クラウド保存は未設定ですが、ローカル記録は使えます。',
+    cloudLoginRequired: 'ログインは任意です。ログインしなくてもローカル保存は使えます。',
+    cloudReady: 'ログイン中です。記録はローカル保存後、自動でクラウドにも保存されます。',
+    cloudLoading: 'クラウド記録を読み込み中...',
+    cloudLoaded: '{count} 件のクラウド記録を読み込みました。',
+    cloudFailed: 'クラウド操作に失敗しました。ローカル記録は引き続き使えます。',
+    cloudBadge: 'クラウド',
+    cloudAutoSaving: 'クラウドに保存中...',
+    cloudAutoSaved: 'クラウドに保存しました。',
+  },
+  ko: {
+    accountNavGuest: 'Tool48 계정',
+    cloudEyebrow: '선택형 클라우드 저장',
+    cloudTitle: 'Tool48 계정',
+    cloudChecking: '로그인 상태 확인 중...',
+    cloudNicknameLabel: '닉네임',
+    cloudNicknamePlaceholder: '예: gomensensei',
+    cloudEmailLabel: '계정 이메일',
+    cloudPasswordLabel: '비밀번호',
+    cloudPasswordPlaceholder: '6자 이상',
+    cloudSignIn: '로그인',
+    cloudCreateAccount: '계정 만들기',
+    cloudSignOut: '로그아웃',
+    cloudUnconfigured: '클라우드 저장이 설정되지 않았지만 로컬 기록은 계속 사용할 수 있습니다.',
+    cloudLoginRequired: '로그인은 선택 사항입니다. 계정 없이도 로컬 저장을 계속 사용할 수 있습니다.',
+    cloudReady: '로그인했습니다. 기록은 로컬에 먼저 저장된 뒤 클라우드에 자동 백업됩니다.',
+    cloudLoading: '클라우드 기록 불러오는 중...',
+    cloudLoaded: '클라우드 기록 {count}개를 불러왔습니다.',
+    cloudFailed: '클라우드 작업에 실패했습니다. 로컬 기록은 계속 사용할 수 있습니다.',
+    cloudBadge: '클라우드',
+    cloudAutoSaving: '클라우드에 저장 중...',
+    cloudAutoSaved: '클라우드에 저장했습니다.',
+  },
+  th: {
+    accountNavGuest: 'บัญชี Tool48',
+    cloudEyebrow: 'บันทึกบนคลาวด์แบบเลือกใช้',
+    cloudTitle: 'บัญชี Tool48',
+    cloudChecking: 'กำลังตรวจสอบสถานะเข้าสู่ระบบ...',
+    cloudNicknameLabel: 'Nickname',
+    cloudNicknamePlaceholder: 'เช่น gomensensei',
+    cloudEmailLabel: 'อีเมลบัญชี',
+    cloudPasswordLabel: 'รหัสผ่าน',
+    cloudPasswordPlaceholder: 'อย่างน้อย 6 ตัวอักษร',
+    cloudSignIn: 'เข้าสู่ระบบ',
+    cloudCreateAccount: 'สร้างบัญชี',
+    cloudSignOut: 'ออกจากระบบ',
+    cloudUnconfigured: 'ยังไม่ได้ตั้งค่าคลาวด์ แต่ข้อมูลในเครื่องยังใช้ได้',
+    cloudLoginRequired: 'การเข้าสู่ระบบเป็นทางเลือก ใช้การบันทึกในเครื่องต่อได้โดยไม่ต้องมีบัญชี',
+    cloudReady: 'เข้าสู่ระบบแล้ว ข้อมูลจะบันทึกในเครื่องก่อน แล้วสำรองขึ้นคลาวด์อัตโนมัติ',
+    cloudLoading: 'กำลังโหลดข้อมูลจากคลาวด์...',
+    cloudLoaded: 'โหลดข้อมูลคลาวด์ {count} รายการแล้ว',
+    cloudFailed: 'การทำงานบนคลาวด์ล้มเหลว ข้อมูลในเครื่องยังใช้ได้',
+    cloudBadge: 'คลาวด์',
+    cloudAutoSaving: 'กำลังบันทึกบนคลาวด์...',
+    cloudAutoSaved: 'บันทึกบนคลาวด์แล้ว',
+  },
+  id: {
+    accountNavGuest: 'Akun Tool48',
+    cloudEyebrow: 'Cloud Save Opsional',
+    cloudTitle: 'Akun Tool48',
+    cloudChecking: 'Memeriksa status akun...',
+    cloudNicknameLabel: 'Nickname',
+    cloudNicknamePlaceholder: 'contoh: gomensensei',
+    cloudEmailLabel: 'Email akun',
+    cloudPasswordLabel: 'Password',
+    cloudPasswordPlaceholder: 'minimal 6 karakter',
+    cloudSignIn: 'Masuk',
+    cloudCreateAccount: 'Buat akun',
+    cloudSignOut: 'Keluar',
+    cloudUnconfigured: 'Cloud save belum dikonfigurasi. Catatan lokal tetap bisa digunakan.',
+    cloudLoginRequired: 'Login bersifat opsional. Catatan lokal tetap bisa digunakan tanpa akun.',
+    cloudReady: 'Sudah masuk. Catatan disimpan lokal lebih dulu, lalu otomatis dicadangkan ke cloud.',
+    cloudLoading: 'Memuat catatan cloud...',
+    cloudLoaded: 'Memuat {count} catatan cloud.',
+    cloudFailed: 'Aksi cloud gagal. Catatan lokal tetap bisa digunakan.',
+    cloudBadge: 'Cloud',
+    cloudAutoSaving: 'Menyimpan ke cloud...',
+    cloudAutoSaved: 'Tersimpan ke cloud.',
+  },
+};
+Object.entries(ACCOUNT_POPOVER_I18N).forEach(([lang, values]) => Object.assign(I18N[lang], values));
+
 let appState = { lang: 'ja', members: [], records: [], simulator: null, session: null, cloudPublicRecords: [], cloudStatsLoaded: false, lastCloudLoadUserId: '' };
 let simulatorRuntime = { dragging: false, angle: 0, lastAngle: 0, lastTime: 0, accumulatedSlowDelta: 0, smoothedSpeed: 0, lastDropAt: 0, lastFastNoticeAt: 0 };
 
@@ -377,7 +542,7 @@ const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => Array.from(document.querySelectorAll(selector));
 
 const els = {
-  languageSelect: $('#languageSelect'), accountNavLink: $('#accountNavLink'), recordForm: $('#recordForm'), editingId: $('#editingId'), nameInput: $('#nameInput'), dateInput: $('#dateInput'), performanceSelect: $('#performanceSelect'), spinCountInput: $('#spinCountInput'), costOutput: $('#costOutput'), winCountInput: $('#winCountInput'), prizeSelect: $('#prizeSelect'), memberSelect: $('#memberSelect'), publicConsentInput: $('#publicConsentInput'), clearFormBtn: $('#clearFormBtn'), downloadCurrentBtn: $('#downloadCurrentBtn'), previewCanvas: $('#previewCanvas'), recordList: $('#recordList'), exportJsonBtn: $('#exportJsonBtn'), importJsonInput: $('#importJsonInput'), deleteAllBtn: $('#deleteAllBtn'), kpiGrid: $('#kpiGrid'), pieCanvas: $('#pieCanvas'), barCanvas: $('#barCanvas'), radarCanvas: $('#radarCanvas'), winRateCanvas: $('#winRateCanvas'), timelineCanvas: $('#timelineCanvas'), memberHeatmap: $('#memberHeatmap'), memberRanking: $('#memberRanking'), performanceRanking: $('#performanceRanking'), winRateRanking: $('#winRateRanking'), roiRanking: $('#roiRanking'), imageDialog: $('#imageDialog'), dialogImage: $('#dialogImage'), closeDialogBtn: $('#closeDialogBtn'), garaponMachine: $('#garaponMachine'), garaponDrum: $('#garaponDrum'), garaponHandle: $('#garaponHandle'), lastBall: $('#lastBall'), simHint: $('#simHint'), simTotalTurns: $('#simTotalTurns'), simWinRate: $('#simWinRate'), resetSimulatorBtn: $('#resetSimulatorBtn'), simRecordList: $('#simRecordList'), cloudPanel: $('#cloudPanel'), cloudStatus: $('#cloudStatus'), cloudMessage: $('#cloudMessage'), syncLocalBtn: $('#syncLocalBtn'), loadCloudBtn: $('#loadCloudBtn'), publicSourceNote: $('#publicSourceNote')
+  languageSelect: $('#languageSelect'), accountToggleBtn: $('#accountToggleBtn'), accountPopover: $('#accountPopover'), recordForm: $('#recordForm'), editingId: $('#editingId'), nameInput: $('#nameInput'), dateInput: $('#dateInput'), performanceSelect: $('#performanceSelect'), spinCountInput: $('#spinCountInput'), costOutput: $('#costOutput'), winCountInput: $('#winCountInput'), prizeSelect: $('#prizeSelect'), memberSelect: $('#memberSelect'), publicConsentInput: $('#publicConsentInput'), clearFormBtn: $('#clearFormBtn'), downloadCurrentBtn: $('#downloadCurrentBtn'), previewCanvas: $('#previewCanvas'), recordList: $('#recordList'), exportJsonBtn: $('#exportJsonBtn'), importJsonInput: $('#importJsonInput'), deleteAllBtn: $('#deleteAllBtn'), kpiGrid: $('#kpiGrid'), pieCanvas: $('#pieCanvas'), barCanvas: $('#barCanvas'), radarCanvas: $('#radarCanvas'), winRateCanvas: $('#winRateCanvas'), timelineCanvas: $('#timelineCanvas'), memberHeatmap: $('#memberHeatmap'), memberRanking: $('#memberRanking'), performanceRanking: $('#performanceRanking'), winRateRanking: $('#winRateRanking'), roiRanking: $('#roiRanking'), imageDialog: $('#imageDialog'), dialogImage: $('#dialogImage'), closeDialogBtn: $('#closeDialogBtn'), garaponMachine: $('#garaponMachine'), garaponDrum: $('#garaponDrum'), garaponHandle: $('#garaponHandle'), lastBall: $('#lastBall'), simHint: $('#simHint'), simTotalTurns: $('#simTotalTurns'), simWinRate: $('#simWinRate'), resetSimulatorBtn: $('#resetSimulatorBtn'), simRecordList: $('#simRecordList'), cloudStatus: $('#cloudStatus'), cloudMessage: $('#cloudMessage'), publicSourceNote: $('#publicSourceNote')
 };
 
 // Future backend adapter reservation.
@@ -414,10 +579,33 @@ function getAuthDisplayName() {
 }
 
 function renderAccountNav() {
-  if (!els.accountNavLink) return;
+  if (!els.accountToggleBtn) return;
   const label = getAuthDisplayName() || t('accountNavGuest');
-  els.accountNavLink.textContent = label;
-  els.accountNavLink.title = label;
+  els.accountToggleBtn.textContent = label;
+  els.accountToggleBtn.title = label;
+}
+
+function setAccountPopoverOpen(open) {
+  if (!els.accountToggleBtn || !els.accountPopover) return;
+  els.accountPopover.hidden = !open;
+  els.accountToggleBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+}
+
+function isAccountPopoverOpen() {
+  return Boolean(els.accountPopover && !els.accountPopover.hidden);
+}
+
+function bindAccountPopover() {
+  if (!els.accountToggleBtn || !els.accountPopover) return;
+  els.accountToggleBtn.addEventListener('click', (event) => {
+    event.stopPropagation();
+    setAccountPopoverOpen(!isAccountPopoverOpen());
+  });
+  els.accountPopover.addEventListener('click', (event) => event.stopPropagation());
+  document.addEventListener('click', () => setAccountPopoverOpen(false));
+  window.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') setAccountPopoverOpen(false);
+  });
 }
 
 function setCloudMessage(message) {
@@ -1099,7 +1287,7 @@ function bindCloudEvents() {
 }
 
 async function loadMembers() { try { const response = await fetch('members.json', { cache: 'no-store' }); if (!response.ok) throw new Error('members.json not found'); appState.members = await response.json(); if (typeof initSilentPreloader === 'function') initSilentPreloader(appState.members, 'image', 'imgLoaded'); } catch { appState.members = []; } }
-function bindEvents() { els.languageSelect.addEventListener('change', () => { appState.lang = els.languageSelect.value; localStorage.setItem(GARAPON_CONFIG.languageKey, appState.lang); applyLanguage(); }); $$('.tab-button').forEach((button) => button.addEventListener('click', () => switchTab(button.dataset.tab))); els.recordForm.addEventListener('submit', saveFormRecord); ['input', 'change'].forEach((eventName) => { [els.nameInput, els.dateInput, els.performanceSelect, els.spinCountInput, els.winCountInput, els.prizeSelect, els.memberSelect, els.publicConsentInput].forEach((node) => node.addEventListener(eventName, debounce(renderPreviewFromForm, 60))); }); els.clearFormBtn.addEventListener('click', resetForm); els.downloadCurrentBtn.addEventListener('click', () => downloadRecordCard(collectFormRecord({ keepId: false }))); els.recordList.addEventListener('click', handleRecordListClick); els.exportJsonBtn.addEventListener('click', exportJson); els.importJsonInput.addEventListener('change', importJson); els.deleteAllBtn.addEventListener('click', deleteAllRecords); els.closeDialogBtn.addEventListener('click', () => els.imageDialog.close()); bindSimulatorEvents(); bindCloudEvents(); window.addEventListener('resize', debounce(() => { renderPreviewFromForm(); renderPublicStats(); }, 180)); }
+function bindEvents() { els.languageSelect.addEventListener('change', () => { appState.lang = els.languageSelect.value; localStorage.setItem(GARAPON_CONFIG.languageKey, appState.lang); applyLanguage(); }); $$('.tab-button').forEach((button) => button.addEventListener('click', () => switchTab(button.dataset.tab))); els.recordForm.addEventListener('submit', saveFormRecord); ['input', 'change'].forEach((eventName) => { [els.nameInput, els.dateInput, els.performanceSelect, els.spinCountInput, els.winCountInput, els.prizeSelect, els.memberSelect, els.publicConsentInput].forEach((node) => node.addEventListener(eventName, debounce(renderPreviewFromForm, 60))); }); els.clearFormBtn.addEventListener('click', resetForm); els.downloadCurrentBtn.addEventListener('click', () => downloadRecordCard(collectFormRecord({ keepId: false }))); els.recordList.addEventListener('click', handleRecordListClick); els.exportJsonBtn.addEventListener('click', exportJson); els.importJsonInput.addEventListener('change', importJson); els.deleteAllBtn.addEventListener('click', deleteAllRecords); els.closeDialogBtn.addEventListener('click', () => els.imageDialog.close()); bindSimulatorEvents(); bindAccountPopover(); bindCloudEvents(); window.addEventListener('resize', debounce(() => { renderPreviewFromForm(); renderPublicStats(); }, 180)); }
 async function init() { appState.lang = detectLanguage(); loadRecords(); loadSimulatorState(); populatePerformanceOptions(); await loadMembers(); populateMemberOptions(); bindEvents(); applyLanguage(); updateCost(); renderRecords(); renderPublicStats(); renderSimulator(); renderPreviewFromForm(); }
 
 document.addEventListener('DOMContentLoaded', init);
