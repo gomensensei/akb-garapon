@@ -1,4 +1,12 @@
+@font-face { font-family: 'ITC Avant Garde Gothic Std Extra Light'; src: url('fonts/ITC Avant Garde Gothic Std Extra Light.woff2') format('woff2'); }
+@font-face { font-family: 'AR ADGothicJP'; src: url('fonts/jadhei01m.woff2') format('woff2'); }
+@font-face { font-family: 'KozGoPr6N'; src: url('fonts/KozGoPr6N-Medium.woff2') format('woff2'); }
+
 :root {
+  --tool48-primary: #F676A6;
+  --tool48-primary-hover: #E55A8C;
+  --tool48-account-bg: rgba(255, 255, 255, 0.58);
+  --tool48-account-border: rgba(255, 255, 255, 0.6);
   --glass: rgba(255, 255, 255, 0.52);
   --glass-strong: rgba(255, 255, 255, 0.78);
   --ink: #172033;
@@ -13,7 +21,7 @@
 
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
-body { color: var(--ink); }
+body { color: var(--ink); font-family: 'KozGoPr6N', 'AR ADGothicJP', 'Noto Sans JP', sans-serif; }
 button, select, input, label { font: inherit; }
 button, .language-select, .file-button { flex-shrink: 0; white-space: nowrap; }
 input, select { min-width: 0; }
@@ -59,14 +67,14 @@ input, select { min-width: 0; }
   border-radius: 999px;
   border: 1px solid rgba(255,255,255,0.86);
   background: rgba(255,255,255,0.74);
-  color: var(--pink-strong, #ff4081);
+  color: var(--tool48-primary);
   text-decoration: none;
   font-size: 12px;
   font-weight: 900;
   box-shadow: 0 10px 26px rgba(255,79,154,0.14);
   flex: 0 0 auto;
 }
-.tool48-home-link:hover { background: rgba(255,255,255,0.92); }
+.tool48-home-link:hover { color: var(--tool48-primary-hover); background: rgba(255,255,255,0.92); }
 .brand {
   display: inline-flex;
   align-items: center;
@@ -85,8 +93,8 @@ input, select { min-width: 0; }
   place-items: center;
   font-weight: 900;
   color: #fff;
-  background: linear-gradient(135deg, #ff4f9a, #ff9d4d);
-  box-shadow: 0 12px 34px rgba(255, 64, 129, 0.25);
+  background: linear-gradient(135deg, var(--tool48-primary), var(--tool48-primary-hover));
+  box-shadow: 0 12px 34px rgba(246, 118, 166, 0.25);
 }
 .brand strong { display: block; font-size: 16px; line-height: 1.15; }
 .brand strong, .brand em {
@@ -134,7 +142,7 @@ input, select { min-width: 0; }
   font-weight: 900;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: #ec4899;
+  color: var(--tool48-primary-hover);
   font-size: 12px;
 }
 .hero h1 {
@@ -244,7 +252,7 @@ input, select { min-width: 0; }
   font-weight: 900;
   font-size: 20px;
 }
-.readonly-field small, .public-consent small, .server-note, .safari-note {
+.field small, .readonly-field small, .public-consent small, .server-note, .safari-note {
   color: var(--muted);
   font-size: 12px;
   line-height: 1.55;
@@ -420,11 +428,11 @@ button, .file-button {
   min-height: 38px;
   padding: 0 12px;
   border-radius: 999px;
-  border: 1px solid rgba(255,255,255,0.86);
-  background: rgba(255,255,255,0.74);
-  color: var(--pink-strong, #ff4081);
+  border: 1px solid var(--tool48-account-border);
+  background: var(--tool48-account-bg);
+  color: var(--tool48-primary);
   font-weight: 800;
-  box-shadow: 0 10px 26px rgba(255,79,154,0.14);
+  box-shadow: 0 8px 22px rgba(246,118,166,0.14);
 }
 
 .account-link::before {
@@ -655,7 +663,7 @@ button, .file-button {
   .field input, .field select, .readonly-field output { min-height: 44px; border-radius: 14px; padding: 0 11px; }
   .readonly-field small { display: none; }
   .public-consent { padding: 11px; margin-top: 12px; }
-  .public-consent small { font-size: 11px; line-height: 1.45; }
+  .field small, .public-consent small { font-size: 11px; line-height: 1.45; }
   .section-head { flex-direction: column; }
   .records-actions { width: 100%; overflow-x: auto; flex-wrap: nowrap; padding-bottom: 3px; }
   .record-item { grid-template-columns: 1fr; }

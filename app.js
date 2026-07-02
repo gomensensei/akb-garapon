@@ -550,17 +550,66 @@ Object.entries(TOOL48_FOOTER_I18N).forEach(([lang, siteDisclaimer]) => {
 });
 
 const TOOL48_PRIVACY_PROMISE_I18N = {
-  en: 'We will not disclose your personal data without your explicit consent.',
-  'zh-Hant': '未經你明確同意，不會披露你的個人資料。',
-  'zh-Hans': '未经你明确同意，不会披露你的个人资料。',
-  ja: '明確な同意なしに、個人情報を開示することはありません。',
-  ko: '명시적인 동의 없이 개인 정보를 공개하지 않습니다.',
-  th: 'เราจะไม่เปิดเผยข้อมูลส่วนบุคคลของคุณหากไม่ได้รับความยินยอมอย่างชัดเจนจากคุณ',
-  id: 'Kami tidak akan mengungkapkan data pribadi Anda tanpa persetujuan jelas dari Anda.'
+  en: 'We will not make your data public without your consent.',
+  'zh-Hant': '未經你同意，不會公開你的資料。',
+  'zh-Hans': '未经你同意，不会公开你的资料。',
+  ja: '同意なしにあなたのデータを公開しません。',
+  ko: '동의 없이 데이터를 공개하지 않습니다.',
+  th: 'เราจะไม่เปิดเผยข้อมูลของคุณต่อสาธารณะโดยไม่ได้รับความยินยอมจากคุณ',
+  id: 'Kami tidak akan mempublikasikan data Anda tanpa persetujuan Anda.'
 };
 
 Object.entries(TOOL48_PRIVACY_PROMISE_I18N).forEach(([lang, privacyPromise]) => {
   if (I18N[lang]) I18N[lang].privacyPromise = privacyPromise;
+});
+
+const GARAPON_ANON_PUBLIC_I18N = {
+  en: {
+    nameLabel: 'Name (anonymized in public data)',
+    namePrivacyHint: 'Name is for your private record only. Public data is anonymized.',
+    publicConsentTitle: 'I agree to publish this record as anonymous public data',
+    publicConsentText: 'Only anonymized data will be public. Name, email, and private details will not be published.'
+  },
+  'zh-Hant': {
+    nameLabel: '姓名（公開數據會匿名化）',
+    namePrivacyHint: '姓名只作私人記錄；公開數據會匿名化。',
+    publicConsentTitle: '我同意以匿名方式公開此紀錄作統計',
+    publicConsentText: '只會公開匿名化數據；姓名、email 及私人資料不會公開。'
+  },
+  'zh-Hans': {
+    nameLabel: '姓名（公开数据会匿名化）',
+    namePrivacyHint: '姓名只作私人记录；公开数据会匿名化。',
+    publicConsentTitle: '我同意以匿名方式公开此记录作统计',
+    publicConsentText: '只会公开匿名化数据；姓名、email 及私人资料不会公开。'
+  },
+  ja: {
+    nameLabel: '名前（公開データでは匿名化）',
+    namePrivacyHint: '名前は自分用の記録のみ。公開データでは匿名化されます。',
+    publicConsentTitle: 'この記録を匿名の公開データとして統計に利用することに同意します',
+    publicConsentText: '公開されるのは匿名化データのみです。名前、email、個人情報は公開されません。'
+  },
+  ko: {
+    nameLabel: '이름 (공개 데이터에서는 익명 처리)',
+    namePrivacyHint: '이름은 개인 기록용이며 공개 데이터는 익명 처리됩니다.',
+    publicConsentTitle: '이 기록을 익명 공개 데이터로 통계에 사용하는 데 동의합니다',
+    publicConsentText: '익명 처리된 데이터만 공개됩니다. 이름, email, 개인 정보는 공개되지 않습니다.'
+  },
+  th: {
+    nameLabel: 'ชื่อ (ข้อมูลสาธารณะจะไม่ระบุตัวตน)',
+    namePrivacyHint: 'ชื่อใช้สำหรับบันทึกส่วนตัวเท่านั้น ข้อมูลสาธารณะจะถูกทำให้ไม่ระบุตัวตน',
+    publicConsentTitle: 'ฉันยินยอมให้เผยแพร่บันทึกนี้เป็นข้อมูลสาธารณะแบบไม่ระบุตัวตน',
+    publicConsentText: 'จะเผยแพร่เฉพาะข้อมูลที่ไม่ระบุตัวตนเท่านั้น ชื่อ email และข้อมูลส่วนตัวจะไม่ถูกเผยแพร่'
+  },
+  id: {
+    nameLabel: 'Nama (dianonimkan dalam data publik)',
+    namePrivacyHint: 'Nama hanya untuk catatan pribadi. Data publik akan dianonimkan.',
+    publicConsentTitle: 'Saya setuju catatan ini dipublikasikan sebagai data publik anonim',
+    publicConsentText: 'Hanya data anonim yang akan dipublikasikan. Nama, email, dan data pribadi tidak akan dipublikasikan.'
+  }
+};
+
+Object.entries(GARAPON_ANON_PUBLIC_I18N).forEach(([lang, values]) => {
+  if (I18N[lang]) Object.assign(I18N[lang], values);
 });
 
 let appState = { lang: 'ja', members: [], records: [], simulator: null, session: null, cloudPublicRecords: [], cloudStatsLoaded: false, lastCloudLoadUserId: '' };

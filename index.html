@@ -7,9 +7,6 @@
   <link rel="icon" href="data:," />
   <title>ガラポンチャレンジ記録</title>
   <meta name="description" content="AKB48 劇場公演のガラポンチャレンジをローカル保存・資料カード化できる非公式ファンツール。" />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="core.css" />
   <link rel="stylesheet" href="style.css" />
 </head>
@@ -103,8 +100,9 @@
 
           <div class="form-grid">
             <label class="field">
-              <span data-i18n="nameLabel">姓名</span>
+              <span data-i18n="nameLabel">姓名（公開數據會匿名化）</span>
               <input id="nameInput" type="text" inputmode="text" placeholder="ゴメン先生" data-i18n-placeholder="namePlaceholder" />
+              <small data-i18n="namePrivacyHint">姓名只作私人記錄；公開數據會匿名化。</small>
             </label>
 
             <label class="field">
@@ -147,8 +145,8 @@
           <label class="public-consent">
             <input id="publicConsentInput" type="checkbox" />
             <span>
-              <strong data-i18n="publicConsentTitle">この記録を将来の公開統計に使ってもよい</strong>
-              <small data-i18n="publicConsentText">現在は端末内だけに保存されます。将来ログイン／サーバー保存を実装するための予約項目です。</small>
+              <strong data-i18n="publicConsentTitle">我同意以匿名方式公開此紀錄作統計</strong>
+              <small data-i18n="publicConsentText">只會公開匿名化數據；姓名、email 及私人資料不會公開。</small>
             </span>
           </label>
 
@@ -307,7 +305,7 @@
 
   <footer class="site-footer">
     <p data-i18n="siteDisclaimer">This unofficial fan site is created by fan Gomen Sensei (gomensensei). Images and related materials are © AKB48 and DH Co., Ltd.</p>
-    <p data-i18n="privacyPromise">We will not disclose your personal data without your explicit consent.</p>
+    <p data-i18n="privacyPromise">未經你同意，不會公開你的資料。</p>
   </footer>
 
   <dialog id="imageDialog" class="image-dialog apple-glass-3d">
