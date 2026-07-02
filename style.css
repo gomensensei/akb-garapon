@@ -27,6 +27,7 @@ input, select { min-width: 0; }
   opacity: 0.26;
   pointer-events: none;
   z-index: -1;
+  display: none;
 }
 .orb-a { top: 8vh; left: -120px; background: #ff4f9a; }
 .orb-b { right: -160px; bottom: 4vh; background: #5bd6ff; }
@@ -49,6 +50,23 @@ input, select { min-width: 0; }
   -webkit-backdrop-filter: blur(18px);
   box-shadow: 0 18px 52px rgba(31, 41, 55, 0.12), inset 0 1px 0 rgba(255,255,255,0.78);
 }
+.tool48-home-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.86);
+  background: rgba(255,255,255,0.74);
+  color: var(--pink-strong, #ff4081);
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 900;
+  box-shadow: 0 10px 26px rgba(255,79,154,0.14);
+  flex: 0 0 auto;
+}
+.tool48-home-link:hover { background: rgba(255,255,255,0.92); }
 .brand {
   display: inline-flex;
   align-items: center;
@@ -402,18 +420,21 @@ button, .file-button {
   min-height: 38px;
   padding: 0 12px;
   border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.86);
+  background: rgba(255,255,255,0.74);
+  color: var(--pink-strong, #ff4081);
+  font-weight: 800;
+  box-shadow: 0 10px 26px rgba(255,79,154,0.14);
 }
 
 .account-link::before {
-  content: "T48";
+  content: "";
+  width: 18px;
+  height: 18px;
   flex-shrink: 0;
-  padding: 2px 6px;
-  border-radius: 999px;
-  background: rgba(255,79,154,0.14);
-  color: var(--pink-strong);
-  font-size: 10px;
-  font-weight: 900;
-  letter-spacing: 0;
+  background: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Ccircle cx='12' cy='10' r='3'/%3E%3Cpath d='M7 20.7c1.2-2.1 3-3.2 5-3.2s3.8 1.1 5 3.2'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Ccircle cx='12' cy='10' r='3'/%3E%3Cpath d='M7 20.7c1.2-2.1 3-3.2 5-3.2s3.8 1.1 5 3.2'/%3E%3C/svg%3E") center / contain no-repeat;
 }
 
 .account-popover.cloud-panel {
@@ -596,6 +617,8 @@ button, .file-button {
   font-size: 12px;
   line-height: 1.7;
 }
+.site-footer p { margin: 0; }
+.site-footer p + p { margin-top: 6px; font-weight: 800; }
 
 @media (max-width: 980px) {
   .grid-layout, .chart-grid, .ranking-grid { grid-template-columns: 1fr; }
@@ -604,14 +627,15 @@ button, .file-button {
 }
 @media (max-width: 640px) {
   .topbar { width: calc(100% - 22px); align-items: center; gap: 8px; padding: 8px; border-radius: 20px; }
-  .brand { gap: 8px; min-width: 0; }
+  .tool48-home-link { min-height: 34px; padding: 6px 8px; font-size: 11px; }
+  .brand { gap: 8px; min-width: 0; flex: 1 1 auto; }
   .brand em { display: none; }
   .brand strong { font-size: 13px; }
   .brand-mark { width: 38px; height: 38px; border-radius: 14px; }
-  .topbar-actions { gap: 6px; max-width: 58%; }
-  .language-select { max-width: 112px; padding-left: 10px; padding-right: 26px; font-size: 12px; }
-  .account-link { max-width: min(132px, 36vw); min-height: 38px; padding: 0 10px; font-size: 12px; }
-  .account-link::before { padding-inline: 5px; font-size: 9px; }
+  .topbar-actions { gap: 6px; max-width: 52%; min-width: 0; }
+  .language-select { max-width: 86px; padding-left: 10px; padding-right: 26px; font-size: 12px; }
+  .account-link { width: 38px; max-width: 38px; min-width: 38px; min-height: 38px; padding: 0; gap: 0; font-size: 0; }
+  .account-link::before { width: 16px; height: 16px; }
   .account-popover { position: fixed; top: 70px; right: 11px; left: 11px; width: auto; max-height: calc(100dvh - 86px); overflow: auto; }
   .account-popover .cloud-login-form,
   .account-popover .cloud-actions { display: grid; grid-template-columns: 1fr; align-items: stretch; }

@@ -549,6 +549,20 @@ Object.entries(TOOL48_FOOTER_I18N).forEach(([lang, siteDisclaimer]) => {
   if (I18N[lang]) I18N[lang].siteDisclaimer = siteDisclaimer;
 });
 
+const TOOL48_PRIVACY_PROMISE_I18N = {
+  en: 'We will not disclose your personal data without your explicit consent.',
+  'zh-Hant': '未經你明確同意，不會披露你的個人資料。',
+  'zh-Hans': '未经你明确同意，不会披露你的个人资料。',
+  ja: '明確な同意なしに、個人情報を開示することはありません。',
+  ko: '명시적인 동의 없이 개인 정보를 공개하지 않습니다.',
+  th: 'เราจะไม่เปิดเผยข้อมูลส่วนบุคคลของคุณหากไม่ได้รับความยินยอมอย่างชัดเจนจากคุณ',
+  id: 'Kami tidak akan mengungkapkan data pribadi Anda tanpa persetujuan jelas dari Anda.'
+};
+
+Object.entries(TOOL48_PRIVACY_PROMISE_I18N).forEach(([lang, privacyPromise]) => {
+  if (I18N[lang]) I18N[lang].privacyPromise = privacyPromise;
+});
+
 let appState = { lang: 'ja', members: [], records: [], simulator: null, session: null, cloudPublicRecords: [], cloudStatsLoaded: false, lastCloudLoadUserId: '' };
 let simulatorRuntime = { dragging: false, angle: 0, lastAngle: 0, lastTime: 0, accumulatedSlowDelta: 0, smoothedSpeed: 0, lastDropAt: 0, lastFastNoticeAt: 0 };
 
@@ -597,6 +611,7 @@ function renderAccountNav() {
   const label = getAuthDisplayName() || t('accountNavGuest');
   els.accountToggleBtn.textContent = label;
   els.accountToggleBtn.title = label;
+  els.accountToggleBtn.setAttribute('aria-label', label);
 }
 
 function setAccountPopoverOpen(open) {
