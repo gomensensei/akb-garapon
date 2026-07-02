@@ -563,6 +563,20 @@ Object.entries(TOOL48_PRIVACY_PROMISE_I18N).forEach(([lang, privacyPromise]) => 
   if (I18N[lang]) I18N[lang].privacyPromise = privacyPromise;
 });
 
+const TOOL48_FOOTER_ACTION_I18N = {
+  en: { reportBug: 'Report Bug', donate: 'Donate' },
+  'zh-Hant': { reportBug: '回報錯誤', donate: '捐款支持' },
+  'zh-Hans': { reportBug: '报告错误', donate: '捐款支持' },
+  ja: { reportBug: 'バグ報告', donate: 'カンパ' },
+  ko: { reportBug: '버그 신고', donate: '후원하기' },
+  th: { reportBug: 'รายงานข้อผิดพลาด', donate: 'สนับสนุน' },
+  id: { reportBug: 'Laporkan Bug', donate: 'Donasi' }
+};
+
+Object.entries(TOOL48_FOOTER_ACTION_I18N).forEach(([lang, values]) => {
+  if (I18N[lang]) Object.assign(I18N[lang], values);
+});
+
 const GARAPON_ANON_PUBLIC_I18N = {
   en: {
     nameLabel: 'Name (anonymized in public data)',
