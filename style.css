@@ -21,7 +21,7 @@
 
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
-body { color: var(--ink); font-family: 'KozGoPr6N', 'AR ADGothicJP', 'Noto Sans JP', sans-serif; font-size: 15px; line-height: 1.46; }
+body { color: var(--ink); font-family: 'Noto Sans TC', 'Microsoft JhengHei', 'PingFang TC', 'Noto Sans SC', 'Microsoft YaHei', 'KozGoPr6N', 'AR ADGothicJP', 'Noto Sans JP', sans-serif; font-size: 15px; line-height: 1.46; }
 button, select, input, label { font: inherit; }
 button, .language-select, .file-button { flex-shrink: 0; white-space: nowrap; }
 input, select { min-width: 0; }
