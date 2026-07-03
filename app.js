@@ -43,7 +43,7 @@ const jaBase = {
   publicEyebrow: 'Public-ready Analytics', publicTitle: '公開許可データの集計', serverNote: '現在はローカル保存された「公開可」記録のみ集計します。',
   pieTitle: '当選内容比率', barTitle: '公演別・抽選玉', radarTitle: '全体バランス', winRateChartTitle: '公演別当選確率', timelineTitle: '時間軸分析',
   memberHeatmapTitle: 'Member Heatmap', memberRankingTitle: '2ショット撮影メンバー', performanceRankingTitle: '公演別サマリー', winRateRankingTitle: '公演別当選確率', roiRankingTitle: '公演別 ROI',
-  imageDialogTitle: '画像プレビュー', iosSafariMessage: 'iPhone / Safari では画像プレビューが開きます。長押しして保存してください。',
+  imageDialogTitle: '画像プレビュー', iosSafariMessage: '画像を長押しして保存してください。',
   selectPlaceholder: '選択しない', memberPlaceholder: '選択しない', noRecords: 'まだ記録がありません。', noPublicRecords: '公開可の記録がまだありません。',
   edit: '編集', duplicate: '複製', download: '画像', delete: '削除', confirmDelete: 'この記録を削除しますか？', confirmDeleteAll: 'すべてのローカル記録を削除しますか？',
   saved: '保存しました。', updated: '更新しました。', imported: '読み込みました。', importFailed: 'JSONを読み込めませんでした。',
@@ -1049,8 +1049,8 @@ function drawRecordCard(ctx, record, width, height) {
 }
 
 function createCardDataUrl(record) { const offscreen = document.createElement('canvas'); renderCardCanvas(offscreen, record, 3); return offscreen.toDataURL('image/png'); }
-function isSafariOrIOS() { const ua = navigator.userAgent; const isIOS = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1); const isSafari = /^((?!chrome|android|crios|fxios|edgios).)*safari/i.test(ua); return isIOS || isSafari; }
-function downloadRecordCard(record) { const dataUrl = createCardDataUrl(record); const filenameParts = ['garapon', record.date || new Date().toISOString().slice(0, 10), normalizeName(record.name) || 'record']; if (isSafariOrIOS()) showImageDialog(dataUrl); else triggerDownload(dataUrl, `${filenameParts.join('_')}.png`); }
+function shouldOpenImagePreview() { const ua = navigator.userAgent; const isMobile = /Android|iPhone|iPad|iPod/i.test(ua) || (navigator.maxTouchPoints > 1 && window.innerWidth <= 768) || window.matchMedia('(max-width: 768px)').matches; const isIOS = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1); const isSafari = /^((?!chrome|android|crios|fxios|edgios).)*safari/i.test(ua); return isMobile || isIOS || isSafari; }
+function downloadRecordCard(record) { const dataUrl = createCardDataUrl(record); const filenameParts = ['garapon', record.date || new Date().toISOString().slice(0, 10), normalizeName(record.name) || 'record']; if (shouldOpenImagePreview()) showImageDialog(dataUrl); else triggerDownload(dataUrl, `${filenameParts.join('_')}.png`); }
 function showImageDialog(dataUrl) { els.dialogImage.src = dataUrl; if (typeof els.imageDialog.showModal === 'function') els.imageDialog.showModal(); else { window.open(dataUrl, '_blank', 'noopener'); alert(t('iosSafariMessage')); } }
 
 function renderRecords() {
