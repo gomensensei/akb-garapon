@@ -536,13 +536,13 @@ const ACCOUNT_POPOVER_I18N = {
 Object.entries(ACCOUNT_POPOVER_I18N).forEach(([lang, values]) => Object.assign(I18N[lang], values));
 
 const TOOL48_FOOTER_I18N = {
-  en: 'This unofficial fan site is created by fan Gomen Sensei (gomensensei). Images and related materials are © AKB48 and DH Co., Ltd.',
-  'zh-Hant': '本非官方粉絲網站由粉絲 Gomen Sensei (gomensensei) 製作。圖片及相關素材版權屬於 AKB48 與 DH Co., Ltd.',
-  'zh-Hans': '本非官方粉丝网站由粉丝 Gomen Sensei (gomensensei) 制作。图片及相关素材版权属于 AKB48 与 DH Co., Ltd.',
-  ja: 'この非公式ファンサイトは、ファンの Gomen Sensei (gomensensei) が制作しています。画像および関連素材の権利は AKB48 と DH Co., Ltd. に帰属します。',
-  ko: '이 비공식 팬 사이트는 팬 Gomen Sensei (gomensensei)가 제작했습니다. 이미지 및 관련 자료의 권리는 AKB48 및 DH Co., Ltd.에 있습니다.',
-  th: 'เว็บไซต์แฟนไซต์ไม่เป็นทางการนี้จัดทำโดยแฟน Gomen Sensei (gomensensei) รูปภาพและสื่อที่เกี่ยวข้องเป็นลิขสิทธิ์ของ AKB48 และ DH Co., Ltd.',
-  id: 'Situs penggemar tidak resmi ini dibuat oleh fan Gomen Sensei (gomensensei). Gambar dan materi terkait adalah milik AKB48 dan DH Co., Ltd.'
+  en: 'This unofficial fan site is created by fan ゴメン先生(gomensensei). Images and related materials are © AKB48 and DH Co., Ltd.',
+  'zh-Hant': '本非官方粉絲網站由粉絲 ゴメン先生(gomensensei) 製作。圖片及相關素材版權屬於 AKB48 與 DH Co., Ltd.',
+  'zh-Hans': '本非官方粉丝网站由粉丝 ゴメン先生(gomensensei) 制作。图片及相关素材版权属于 AKB48 与 DH Co., Ltd.',
+  ja: 'この非公式ファンサイトは、ファンの ゴメン先生(gomensensei) が制作しています。画像および関連素材の権利は AKB48 と DH Co., Ltd. に帰属します。',
+  ko: '이 비공식 팬 사이트는 팬 ゴメン先生(gomensensei)가 제작했습니다. 이미지 및 관련 자료의 권리는 AKB48 및 DH Co., Ltd.에 있습니다.',
+  th: 'เว็บไซต์แฟนไซต์ไม่เป็นทางการนี้จัดทำโดยแฟน ゴメン先生(gomensensei) รูปภาพและสื่อที่เกี่ยวข้องเป็นลิขสิทธิ์ของ AKB48 และ DH Co., Ltd.',
+  id: 'Situs penggemar tidak resmi ini dibuat oleh fan ゴメン先生(gomensensei). Gambar dan materi terkait adalah milik AKB48 dan DH Co., Ltd.'
 };
 
 Object.entries(TOOL48_FOOTER_I18N).forEach(([lang, siteDisclaimer]) => {
