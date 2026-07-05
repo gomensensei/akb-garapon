@@ -3,12 +3,14 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="tool48-turnstile-site-key" content="" />
   <meta name="theme-color" content="#ff4f9a" />
   <link rel="icon" href="data:," />
   <title>Tool48 Account</title>
   <meta name="description" content="Optional Tool48 account login for Garapon cloud save." />
   <link rel="stylesheet" href="core.css" />
   <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="tool48-install.css?v=20260706-security" />
 </head>
 <body class="native-feel" data-tool48-auth-redirect="index.html">
   <div class="bg-orb orb-a" aria-hidden="true"></div>
@@ -68,6 +70,7 @@
           </label>
           <button type="submit" class="primary-button hover-glow" data-tool48-auth-action="signin" data-i18n="cloudSignIn">Sign in</button>
           <button type="submit" class="secondary-button hover-glow" data-tool48-auth-action="signup" data-i18n="cloudCreateAccount">Create account</button>
+          <button type="button" class="tool48-reset-link" data-tool48-reset-password>Forgot password</button>
           <p class="server-note" data-tool48-auth-message></p>
         </form>
 
@@ -103,7 +106,9 @@
   <script src="assets/js/supabase-config.js"></script>
   <script src="assets/js/supabase-client.js"></script>
   <script src="assets/js/account-page.js"></script>
+  <script src="tool48-security.js?v=20260706-security"></script>
   <script src="assets/js/auth.js"></script>
   <script src="core.js"></script>
+  <script src="tool48-install.js?v=20260706-security"></script>
 </body>
 </html>

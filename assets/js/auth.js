@@ -196,13 +196,16 @@
     return session;
   }
 
-  async function signUpWithPassword(email, password, nickname) {
+  async function signUpWithPassword(email, password, nickname, captchaToken) {
     var client = getClient();
     if (!client) throw new Error(text("unconfigured"));
     var result = await client.auth.signUp({
       email: email,
       password: password,
-      options: {
+      options: window.Tool48Security?.authOptions({
+        data: { display_name: nickname },
+        emailRedirectTo: window.location.origin + window.location.pathname
+      }, captchaToken) || {
         data: { display_name: nickname },
         emailRedirectTo: window.location.origin + window.location.pathname
       }
@@ -214,10 +217,12 @@
     return result.data;
   }
 
-  async function signInWithPassword(email, password) {
+  async function signInWithPassword(email, password, captchaToken) {
     var client = getClient();
     if (!client) throw new Error(text("unconfigured"));
-    var result = await client.auth.signInWithPassword({ email: email, password: password });
+    var result = await client.auth.signInWithPassword(
+      window.Tool48Security?.signInPayload(email, password, captchaToken) || { email: email, password: password }
+    );
     if (result.error) throw result.error;
     session = result.data.session || null;
     notify();
@@ -262,16 +267,43 @@
         }
         try {
           if (message) message.textContent = action === "signup" ? text("signingUp") : text("signingIn");
+          var captchaToken = await window.Tool48Security?.getCaptchaToken(action, form);
           if (action === "signup") {
-            var signupData = await signUpWithPassword(email, password, nickname);
+            var signupData = await signUpWithPassword(email, password, nickname, captchaToken);
             if (message) message.textContent = signupData.session ? text("signupReady") : text("signupNeedsConfirm");
             if (signupData.session) redirectAfterAuthIfNeeded();
           } else {
-            await signInWithPassword(email, password);
+            await signInWithPassword(email, password, captchaToken);
             if (message) message.textContent = text("signinReady");
             redirectAfterAuthIfNeeded();
           }
+          window.Tool48Security?.clearAuthFailures(email);
         } catch (error) {
+          window.Tool48Security?.recordAuthFailure(email);
+          window.Tool48Security?.resetCaptcha(form);
+          if (message) message.textContent = error.message || text("authFailed");
+        }
+      });
+
+      form.querySelector("[data-tool48-reset-password]")?.addEventListener("click", async function () {
+        var emailInput = form.querySelector("[data-tool48-email]");
+        var message = form.querySelector("[data-tool48-auth-message]");
+        var email = emailInput ? emailInput.value.trim() : "";
+        if (!email) {
+          if (message) message.textContent = window.Tool48Security?.text("resetMissingEmail") || text("missingEmailPassword");
+          return;
+        }
+        try {
+          if (message) message.textContent = window.Tool48Security?.text("resetSending") || "";
+          if (window.Tool48Security?.requestPasswordReset) {
+            await window.Tool48Security.requestPasswordReset(getClient(), email, form);
+          } else {
+            await getClient().auth.resetPasswordForEmail(email, { redirectTo: window.location.href });
+          }
+          if (message) message.textContent = window.Tool48Security?.text("resetSent") || "";
+        } catch (error) {
+          window.Tool48Security?.recordAuthFailure(email);
+          window.Tool48Security?.resetCaptcha(form);
           if (message) message.textContent = error.message || text("authFailed");
         }
       });

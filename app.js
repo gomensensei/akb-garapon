@@ -898,6 +898,8 @@ async function loadCloudRecords(options = {}) {
 
 function getGaraponCloudErrorMessage(error) {
   const text = [error?.message, error?.details, error?.hint, String(error || '')].filter(Boolean).join(' ');
+  const guardMessage = window.Tool48Security?.guardMessage(error);
+  if (guardMessage) return guardMessage;
   if (/tool48_garapon_cloud_record_limit_reached|garapon_records limit/i.test(text)) {
     return t('cloudRecordLimitReached');
   }
