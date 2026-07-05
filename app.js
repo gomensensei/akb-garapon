@@ -10,6 +10,8 @@ const GARAPON_CONFIG = {
   simulatorDefaults: { white: 250, red: 30, green: 20, maxHistory: 50 },
 };
 
+const GARAPON_CLOUD_RECORD_LIMIT = 200;
+
 const PERFORMANCES = [
   { id: 'reset', label: 'ＲＥＳＥＴ公演' },
   { id: 'kokokarada', label: 'ここからだ公演' },
@@ -185,6 +187,7 @@ const CLOUD_I18N = {
   cloudSynced: 'Cloud sync complete: {count} record(s) saved.',
   cloudLoaded: 'Loaded {count} cloud record(s).',
   cloudFailed: 'Cloud action failed. Local records were not changed.',
+  cloudRecordLimitReached: 'Cloud save can keep up to 200 records. Delete old cloud records before saving more.',
   cloudNoRecords: 'No local records to sync.',
   cloudBadge: 'Cloud',
   accountNavGuest: 'Account',
@@ -369,6 +372,12 @@ Object.assign(I18N.ja, { accountNavGuest: 'アカウント', cloudAutoSaving: '�
 Object.assign(I18N.ko, { accountNavGuest: '계정', cloudAutoSaving: '클라우드에 저장 중...', cloudAutoSaved: '클라우드에 저장했습니다.' });
 Object.assign(I18N.th, { accountNavGuest: 'บัญชี', cloudAutoSaving: 'กำลังบันทึกบนคลาวด์...', cloudAutoSaved: 'บันทึกบนคลาวด์แล้ว' });
 Object.assign(I18N.id, { accountNavGuest: 'Akun', cloudAutoSaving: 'Menyimpan ke cloud...', cloudAutoSaved: 'Tersimpan ke cloud.' });
+Object.assign(I18N['zh-Hant'], { cloudRecordLimitReached: '雲端最多可保存 200 筆紀錄。請先刪除舊紀錄，再保存新紀錄。' });
+Object.assign(I18N['zh-Hans'], { cloudRecordLimitReached: '云端最多可保存 200 条记录。请先删除旧记录，再保存新记录。' });
+Object.assign(I18N.ja, { cloudRecordLimitReached: 'クラウド保存は最大200件までです。古い記録を削除してから新しく保存してください。' });
+Object.assign(I18N.ko, { cloudRecordLimitReached: '클라우드에는 최대 200개 기록까지 저장할 수 있습니다. 새로 저장하기 전에 이전 기록을 삭제해 주세요.' });
+Object.assign(I18N.th, { cloudRecordLimitReached: 'Cloud save เก็บได้สูงสุด 200 รายการ โปรดลบรายการเก่าก่อนบันทึกรายการใหม่' });
+Object.assign(I18N.id, { cloudRecordLimitReached: 'Cloud save dapat menyimpan hingga 200 catatan. Hapus catatan lama sebelum menyimpan yang baru.' });
 
 const ACCOUNT_POPOVER_I18N = {
   en: {
@@ -784,7 +793,7 @@ async function saveRecordToCloud(record) {
   } else {
     result = await client.from('garapon_records').insert(payload).select('id').single();
   }
-  if (result.error) throw result.error;
+  if (result.error) throw new Error(getGaraponCloudErrorMessage(result.error));
   record.cloudRecordId = result.data.id;
   await backendAdapter.syncPublicRecord(record);
   return record;
@@ -828,9 +837,17 @@ async function syncLocalRecordsToCloud() {
     const client = getSupabaseClient();
     const user = getAuthUser();
     if (!client || !user) throw new Error(t('cloudLoginRequired'));
-    const existing = await client.from('garapon_records').select('id,event_date,performance_id,spin_count,win_count,prize_type,member_id,created_at');
+    const existing = await client.from('garapon_records')
+      .select('id,event_date,performance_id,spin_count,win_count,prize_type,member_id,created_at', { count: 'exact' })
+      .eq('user_id', user.id)
+      .limit(GARAPON_CLOUD_RECORD_LIMIT);
     if (existing.error) throw existing.error;
     const existingBySignature = new Map((existing.data || []).map((row) => [getRecordSignature(fromDbRecord(row)), row.id]));
+    const remoteCount = existing.count ?? existingBySignature.size;
+    const newRecordCount = appState.records.filter((record) => !record.cloudRecordId && !existingBySignature.has(getRecordSignature(record))).length;
+    if (remoteCount + newRecordCount > GARAPON_CLOUD_RECORD_LIMIT) {
+      throw new Error(t('cloudRecordLimitReached'));
+    }
     let savedCount = 0;
     for (const record of appState.records) {
       if (!record.cloudRecordId && existingBySignature.has(getRecordSignature(record))) record.cloudRecordId = existingBySignature.get(getRecordSignature(record));
@@ -843,7 +860,7 @@ async function syncLocalRecordsToCloud() {
     setCloudMessage(t('cloudSynced', { count: savedCount }));
   } catch (error) {
     console.warn('Garapon cloud sync failed', error);
-    setCloudMessage(error.message || t('cloudFailed'));
+    setCloudMessage(getGaraponCloudErrorMessage(error));
   }
 }
 
@@ -856,7 +873,9 @@ async function loadCloudRecords(options = {}) {
     if (!client || !user) throw new Error(t('cloudLoginRequired'));
     const { data, error } = await client.from('garapon_records')
       .select('id,event_date,performance_id,spin_count,cost_yen,win_count,prize_type,member_id,name_private,public_consent,created_at,updated_at')
-      .order('created_at', { ascending: false });
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false })
+      .limit(GARAPON_CLOUD_RECORD_LIMIT);
     if (error) throw error;
     const incoming = (data || []).map(fromDbRecord);
     const byCloudId = new Map(appState.records.filter((record) => record.cloudRecordId).map((record) => [record.cloudRecordId, record]));
@@ -873,8 +892,16 @@ async function loadCloudRecords(options = {}) {
     setCloudMessage(t('cloudLoaded', { count: incoming.length }));
   } catch (error) {
     console.warn('Garapon cloud load failed', error);
-    setCloudMessage(error.message || t('cloudFailed'));
+    setCloudMessage(getGaraponCloudErrorMessage(error));
   }
+}
+
+function getGaraponCloudErrorMessage(error) {
+  const text = [error?.message, error?.details, error?.hint, String(error || '')].filter(Boolean).join(' ');
+  if (/tool48_garapon_cloud_record_limit_reached|garapon_records limit/i.test(text)) {
+    return t('cloudRecordLimitReached');
+  }
+  return error?.message || t('cloudFailed');
 }
 
 async function refreshCloudPublicStats() {
