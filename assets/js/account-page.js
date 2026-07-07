@@ -159,6 +159,20 @@
     }
   };
 
+  var RESET_PASSWORD_I18N = {
+    en: "Forgot password",
+    "zh-Hant": "忘記密碼",
+    "zh-Hans": "忘记密码",
+    ja: "パスワードを忘れた場合",
+    ko: "비밀번호 찾기",
+    th: "ลืมรหัสผ่าน",
+    id: "Lupa kata sandi"
+  };
+
+  Object.keys(RESET_PASSWORD_I18N).forEach(function (lang) {
+    if (I18N[lang]) I18N[lang].cloudResetPassword = RESET_PASSWORD_I18N[lang];
+  });
+
   function detectLanguage() {
     var saved = "";
     try { saved = localStorage.getItem(languageKey) || ""; } catch (_error) { saved = ""; }

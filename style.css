@@ -471,6 +471,26 @@ button, .file-button {
   gap: 10px;
 }
 
+.cloud-auth-button-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  flex: 1 1 100%;
+}
+
+.cloud-auth-button-row .primary-button,
+.cloud-auth-button-row .secondary-button {
+  width: 100%;
+  min-width: 0;
+  padding-inline: 10px;
+  white-space: nowrap;
+  line-height: 1.1;
+}
+
+.tool48-reset-link {
+  justify-self: start;
+}
+
 .cloud-email-field {
   min-width: min(280px, 100%);
   flex: 1 1 240px;
@@ -668,6 +688,9 @@ button, .file-button {
   .account-popover { position: fixed; top: 70px; right: 11px; left: 11px; width: auto; max-height: calc(100dvh - 86px); overflow: auto; }
   .account-popover .cloud-login-form,
   .account-popover .cloud-actions { display: grid; grid-template-columns: 1fr; align-items: stretch; }
+  .account-popover .cloud-auth-button-row { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+  .account-popover .cloud-auth-button-row .primary-button,
+  .account-popover .cloud-auth-button-row .secondary-button { min-height: 36px; padding-inline: 6px; font-size: 11px; }
   .account-popover .cloud-email-field { min-width: 0; }
   .app-shell { width: calc(100% - 22px); margin-top: 12px; }
   .hero { padding: 14px 16px; }

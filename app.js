@@ -379,6 +379,14 @@ Object.assign(I18N.ko, { cloudRecordLimitReached: '클라우드에는 최대 200
 Object.assign(I18N.th, { cloudRecordLimitReached: 'Cloud save เก็บได้สูงสุด 200 รายการ โปรดลบรายการเก่าก่อนบันทึกรายการใหม่' });
 Object.assign(I18N.id, { cloudRecordLimitReached: 'Cloud save dapat menyimpan hingga 200 catatan. Hapus catatan lama sebelum menyimpan yang baru.' });
 
+Object.assign(I18N.en, { cloudResetPassword: 'Forgot password' });
+Object.assign(I18N['zh-Hant'], { cloudResetPassword: '忘記密碼' });
+Object.assign(I18N['zh-Hans'], { cloudResetPassword: '忘记密码' });
+Object.assign(I18N.ja, { cloudResetPassword: 'パスワードを忘れた場合' });
+Object.assign(I18N.ko, { cloudResetPassword: '비밀번호 찾기' });
+Object.assign(I18N.th, { cloudResetPassword: 'ลืมรหัสผ่าน' });
+Object.assign(I18N.id, { cloudResetPassword: 'Lupa kata sandi' });
+
 const ACCOUNT_POPOVER_I18N = {
   en: {
     accountNavGuest: 'Tool48 Account',

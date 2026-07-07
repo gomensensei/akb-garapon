@@ -68,9 +68,11 @@
             <span data-i18n="cloudPasswordLabel">Password</span>
             <input type="password" autocomplete="current-password" required minlength="6" placeholder="6+ characters" data-tool48-password data-i18n-placeholder="cloudPasswordPlaceholder" />
           </label>
-          <button type="submit" class="primary-button hover-glow" data-tool48-auth-action="signin" data-i18n="cloudSignIn">Sign in</button>
-          <button type="submit" class="secondary-button hover-glow" data-tool48-auth-action="signup" data-i18n="cloudCreateAccount">Create account</button>
-          <button type="button" class="tool48-reset-link" data-tool48-reset-password>Forgot password</button>
+          <div class="cloud-auth-button-row">
+            <button type="submit" class="primary-button hover-glow" data-tool48-auth-action="signin" data-i18n="cloudSignIn">Sign in</button>
+            <button type="submit" class="secondary-button hover-glow" data-tool48-auth-action="signup" data-i18n="cloudCreateAccount">Create account</button>
+          </div>
+          <button type="button" class="tool48-reset-link" data-tool48-reset-password data-i18n="cloudResetPassword">Forgot password</button>
           <p class="server-note" data-tool48-auth-message></p>
         </form>
 
