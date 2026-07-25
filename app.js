@@ -195,7 +195,7 @@ const CLOUD_I18N = {
   cloudAutoSaved: 'Saved to cloud.',
   publicCloudSource: 'Showing approved anonymous cloud submissions only.',
   publicLocalSource: 'Currently calculated only from local records marked as public-ready.',
-  publicNotEnough: 'Not enough anonymous public data yet. Detailed breakdowns appear from 10 approved records.',
+  publicNotEnough: 'Small anonymous sample. Charts stay visible, but treat patterns as reference only.',
 };
 Object.keys(I18N).forEach((lang) => Object.assign(I18N[lang], CLOUD_I18N));
 Object.assign(I18N['zh-Hant'], {
@@ -224,7 +224,7 @@ Object.assign(I18N['zh-Hant'], {
   cloudBadge: '雲端',
   publicCloudSource: '只顯示已通過嘅匿名雲端提交統計。',
   publicLocalSource: '目前只統計本機標記為願意公開嘅紀錄。',
-  publicNotEnough: '匿名公開資料未夠。10 筆或以上 approved 紀錄先會顯示詳細分類。'
+  publicNotEnough: '匿名公開樣本仍少，圖表會照常顯示；請先當作參考趨勢。'
 });
 Object.assign(I18N['zh-Hans'], {
   cloudEyebrow: '可选云端保存',
@@ -252,7 +252,7 @@ Object.assign(I18N['zh-Hans'], {
   cloudBadge: '云端',
   publicCloudSource: '只显示已通过的匿名云端提交统计。',
   publicLocalSource: '目前只统计本机标记为愿意公开的记录。',
-  publicNotEnough: '匿名公开资料不足。10 笔或以上 approved 记录才会显示详细分类。'
+  publicNotEnough: '匿名公开样本仍少，图表会照常显示；请先当作参考趋势。'
 });
 Object.assign(I18N.ja, {
   cloudEyebrow: '任意クラウド保存',
@@ -280,7 +280,7 @@ Object.assign(I18N.ja, {
   cloudBadge: 'クラウド',
   publicCloudSource: '承認済みの匿名クラウド投稿のみを集計しています。',
   publicLocalSource: '現在はローカルの公開可記録のみを集計しています。',
-  publicNotEnough: '匿名公開データがまだ足りません。承認済み記録が10件以上で詳細分類を表示します。'
+  publicNotEnough: '匿名公開データはまだ少なめです。図表は表示しますが、参考傾向として見てください。'
 });
 Object.assign(I18N.ko, {
   cloudEyebrow: '선택형 클라우드 저장',
@@ -308,7 +308,7 @@ Object.assign(I18N.ko, {
   cloudBadge: '클라우드',
   publicCloudSource: '승인된 익명 클라우드 제출만 집계합니다.',
   publicLocalSource: '현재는 로컬에서 공개 가능으로 표시된 기록만 집계합니다.',
-  publicNotEnough: '익명 공개 데이터가 아직 부족합니다. 승인된 기록 10개 이상부터 상세 분류가 표시됩니다.'
+  publicNotEnough: '익명 공개 데이터 표본이 아직 적습니다. 차트는 표시하지만 참고용 추세로 봐 주세요.'
 });
 Object.assign(I18N.th, {
   cloudEyebrow: 'บันทึกบนคลาวด์แบบเลือกใช้',
@@ -336,7 +336,7 @@ Object.assign(I18N.th, {
   cloudBadge: 'คลาวด์',
   publicCloudSource: 'แสดงเฉพาะสถิติจากข้อมูลคลาวด์แบบไม่ระบุตัวตนที่อนุมัติแล้ว',
   publicLocalSource: 'ขณะนี้คำนวณจากข้อมูลในเครื่องที่ทำเครื่องหมาย public-ready เท่านั้น',
-  publicNotEnough: 'ข้อมูลสาธารณะแบบไม่ระบุตัวตนยังไม่พอ รายละเอียดจะแสดงเมื่อมีข้อมูลอนุมัติ 10 รายการขึ้นไป'
+  publicNotEnough: 'ตัวอย่างข้อมูลสาธารณะแบบไม่ระบุตัวตนยังมีน้อย กราฟจะแสดงตามปกติ แต่ควรใช้เป็นแนวโน้มอ้างอิงเท่านั้น'
 });
 Object.assign(I18N.id, {
   cloudEyebrow: 'Cloud Save Opsional',
@@ -364,7 +364,7 @@ Object.assign(I18N.id, {
   cloudBadge: 'Cloud',
   publicCloudSource: 'Hanya menampilkan statistik dari kiriman cloud anonim yang disetujui.',
   publicLocalSource: 'Saat ini dihitung hanya dari catatan lokal yang ditandai public-ready.',
-  publicNotEnough: 'Data publik anonim belum cukup. Detail muncul mulai dari 10 catatan approved.'
+  publicNotEnough: 'Sampel publik anonim masih sedikit. Grafik tetap ditampilkan, tetapi gunakan sebagai tren referensi saja.'
 });
 Object.assign(I18N['zh-Hant'], { accountNavGuest: '帳號', cloudAutoSaving: '保存到雲端中...', cloudAutoSaved: '已保存到雲端。' });
 Object.assign(I18N['zh-Hans'], { accountNavGuest: '账号', cloudAutoSaving: '保存到云端中...', cloudAutoSaved: '已保存到云端。' });
@@ -933,12 +933,6 @@ async function refreshCloudPublicStats() {
   }
 }
 
-function getStatsVisibility(sampleSize) {
-  if (sampleSize < 5) return 'hidden';
-  if (sampleSize < 10) return 'coarse';
-  return 'detailed';
-}
-
 function t(key, vars = {}) {
   const dict = I18N[appState.lang] || I18N.ja;
   let value = dict[key] || I18N.ja[key] || key;
@@ -1165,24 +1159,12 @@ function renderPublicStats() {
     [els.memberHeatmap, els.memberRanking, els.performanceRanking, els.winRateRanking, els.roiRanking].forEach((node) => { if (node) node.innerHTML = `<div class="ranking-empty">${t('noPublicRecords')}</div>`; });
     return;
   }
-  const visibility = usingCloudStats ? getStatsVisibility(publicRecords.length) : 'detailed';
   const summary = summarizePublic(publicRecords);
-  if (visibility === 'hidden') {
-    els.kpiGrid.innerHTML = `<div class="record-empty public-threshold-note">${t('publicNotEnough')}</div>`;
-    if (chartGrid) chartGrid.style.display = 'none';
-    if (rankingGrid) rankingGrid.style.display = 'none';
-    [els.pieCanvas, els.barCanvas, els.radarCanvas, els.winRateCanvas, els.timelineCanvas].forEach(clearChart);
-    return;
-  }
-  if (chartGrid) chartGrid.style.display = visibility === 'detailed' ? '' : 'none';
-  if (rankingGrid) rankingGrid.style.display = visibility === 'detailed' ? '' : 'none';
+  if (chartGrid) chartGrid.style.display = '';
+  if (rankingGrid) rankingGrid.style.display = '';
   const allKpis = [[t('people'), summary.peopleCount.toLocaleString()], [t('records'), summary.recordCount.toLocaleString()], [t('lotteryBalls'), summary.spinTotal.toLocaleString()], [t('cost'), formatYen(summary.costTotal)], [t('wins'), summary.winTotal.toLocaleString()], [t('winRate'), formatPercent(summary.winRate)], [t('avgSpend'), formatYen(summary.avgSpend)]];
-  const kpis = visibility === 'coarse' ? allKpis.slice(1, 6) : allKpis;
-  els.kpiGrid.innerHTML = kpis.map(([label, value]) => `<div class="kpi-card"><small>${escapeHtml(label)}</small><strong>${escapeHtml(value)}</strong></div>`).join('');
-  if (visibility !== 'detailed') {
-    [els.pieCanvas, els.barCanvas, els.radarCanvas, els.winRateCanvas, els.timelineCanvas].forEach(clearChart);
-    return;
-  }
+  const sampleNotice = usingCloudStats && publicRecords.length < 10 ? `<div class="record-empty public-threshold-note">${t('publicNotEnough')}</div>` : '';
+  els.kpiGrid.innerHTML = `${sampleNotice}${allKpis.map(([label, value]) => `<div class="kpi-card"><small>${escapeHtml(label)}</small><strong>${escapeHtml(value)}</strong></div>`).join('')}`;
   drawPieChart(els.pieCanvas, Object.entries(summary.prizeCounts).map(([id, count]) => ({ label: id === 'none' ? t('noPrize') : getPrizeLabel(id), value: count })));
   drawBarChart(els.barCanvas, Object.entries(summary.performanceSpins).map(([id, count]) => ({ label: id === 'none' ? t('noPerformance') : getPerformance(id)?.label || id, value: count })));
   drawRadarChart(els.radarCanvas, [{ label: t('people'), value: summary.peopleCount, max: Math.max(summary.peopleCount, 10) }, { label: t('records'), value: summary.recordCount, max: Math.max(summary.recordCount, 10) }, { label: t('lotteryBalls'), value: summary.spinTotal, max: Math.max(summary.spinTotal, 50) }, { label: t('cost'), value: summary.costTotal / 500, max: Math.max(summary.costTotal / 500, 50) }, { label: t('wins'), value: summary.winTotal, max: Math.max(summary.winTotal, 10) }, { label: t('winRate'), value: Number.isFinite(summary.winRate) ? summary.winRate : 0, max: 100 }]);
