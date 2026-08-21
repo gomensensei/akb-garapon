@@ -13,7 +13,7 @@
   <title>ガラポンチャレンジ記録</title>
   <meta name="description" content="AKB48 劇場公演のガラポンチャレンジをローカル保存・資料カード化できる非公式ファンツール。" />
   <link rel="stylesheet" href="core.css" />
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css?v=20260821-performance-options" />
   <link rel="stylesheet" href="tool48-install.css?v=20260706-security" />
 </head>
 <body class="native-feel">
@@ -122,6 +122,11 @@
             <label class="field wide">
               <span data-i18n="performanceLabel">公演</span>
               <select id="performanceSelect"></select>
+            </label>
+
+            <label class="field wide custom-performance-field" id="customPerformanceField" hidden>
+              <span data-i18n="customPerformanceLabel">その他の公演名</span>
+              <input id="customPerformanceInput" type="text" maxlength="80" data-i18n-placeholder="customPerformancePlaceholder" placeholder="公演名を入力してください" />
             </label>
 
             <label class="field">
@@ -342,7 +347,7 @@
   <script src="tool48-security.js?v=20260706-security"></script>
   <script src="assets/js/auth.js"></script>
   <script src="core.js"></script>
-  <script src="app.js?v=20260704-mobile-export" defer></script>
+  <script src="app.js?v=20260821-performance-options" defer></script>
   <script src="tool48-install.js?v=20260706-security" defer></script>
 </body>
 </html>

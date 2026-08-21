@@ -17,7 +17,11 @@ const PERFORMANCES = [
   { id: 'kokokarada', label: 'ここからだ公演' },
   { id: 'tewotsunaginagara', label: '手をつなぎながら公演' },
   { id: 'sokonimirai', label: 'そこに未来はある公演' },
+  { id: 'yumenopopstar', label: '夢のポップスター公演' },
+  { id: 'other', labelKey: 'otherPerformance' },
 ];
+
+const GARAPON_DB_PERFORMANCE_IDS = new Set(['reset', 'kokokarada', 'tewotsunaginagara', 'sokonimirai']);
 
 const PRIZES = [
   { id: '', labelJa: '' },
@@ -643,6 +647,20 @@ Object.entries(GARAPON_ANON_PUBLIC_I18N).forEach(([lang, values]) => {
   if (I18N[lang]) Object.assign(I18N[lang], values);
 });
 
+const GARAPON_PERFORMANCE_I18N = {
+  ja: { otherPerformance: 'その他', customPerformanceLabel: 'その他の公演名', customPerformancePlaceholder: '公演名を入力してください' },
+  'zh-Hant': { otherPerformance: '其他', customPerformanceLabel: '自訂公演名稱', customPerformancePlaceholder: '請輸入公演名稱' },
+  'zh-Hans': { otherPerformance: '其他', customPerformanceLabel: '自定义公演名称', customPerformancePlaceholder: '请输入公演名称' },
+  en: { otherPerformance: 'Other', customPerformanceLabel: 'Custom performance name', customPerformancePlaceholder: 'Enter a performance name' },
+  ko: { otherPerformance: '기타', customPerformanceLabel: '직접 입력할 공연명', customPerformancePlaceholder: '공연명을 입력하세요' },
+  th: { otherPerformance: 'อื่น ๆ', customPerformanceLabel: 'ชื่อการแสดงอื่น', customPerformancePlaceholder: 'กรอกชื่อการแสดง' },
+  id: { otherPerformance: 'Lainnya', customPerformanceLabel: 'Nama pertunjukan lain', customPerformancePlaceholder: 'Masukkan nama pertunjukan' },
+};
+
+Object.entries(GARAPON_PERFORMANCE_I18N).forEach(([lang, values]) => {
+  if (I18N[lang]) Object.assign(I18N[lang], values);
+});
+
 let appState = { lang: 'ja', members: [], records: [], simulator: null, session: null, cloudPublicRecords: [], cloudStatsLoaded: false, lastCloudLoadUserId: '' };
 let simulatorRuntime = { dragging: false, angle: 0, lastAngle: 0, lastTime: 0, accumulatedSlowDelta: 0, smoothedSpeed: 0, lastDropAt: 0, lastFastNoticeAt: 0 };
 
@@ -650,7 +668,7 @@ const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => Array.from(document.querySelectorAll(selector));
 
 const els = {
-  languageSelect: $('#languageSelect'), accountToggleBtn: $('#accountToggleBtn'), accountPopover: $('#accountPopover'), recordForm: $('#recordForm'), editingId: $('#editingId'), nameInput: $('#nameInput'), dateInput: $('#dateInput'), performanceSelect: $('#performanceSelect'), spinCountInput: $('#spinCountInput'), costOutput: $('#costOutput'), winCountInput: $('#winCountInput'), prizeSelect: $('#prizeSelect'), memberSelect: $('#memberSelect'), publicConsentInput: $('#publicConsentInput'), clearFormBtn: $('#clearFormBtn'), downloadCurrentBtn: $('#downloadCurrentBtn'), previewCanvas: $('#previewCanvas'), recordList: $('#recordList'), exportJsonBtn: $('#exportJsonBtn'), importJsonInput: $('#importJsonInput'), deleteAllBtn: $('#deleteAllBtn'), kpiGrid: $('#kpiGrid'), pieCanvas: $('#pieCanvas'), barCanvas: $('#barCanvas'), radarCanvas: $('#radarCanvas'), winRateCanvas: $('#winRateCanvas'), timelineCanvas: $('#timelineCanvas'), memberHeatmap: $('#memberHeatmap'), memberRanking: $('#memberRanking'), performanceRanking: $('#performanceRanking'), winRateRanking: $('#winRateRanking'), roiRanking: $('#roiRanking'), imageDialog: $('#imageDialog'), dialogImage: $('#dialogImage'), closeDialogBtn: $('#closeDialogBtn'), garaponMachine: $('#garaponMachine'), garaponDrum: $('#garaponDrum'), garaponHandle: $('#garaponHandle'), lastBall: $('#lastBall'), simHint: $('#simHint'), simTotalTurns: $('#simTotalTurns'), simWinRate: $('#simWinRate'), resetSimulatorBtn: $('#resetSimulatorBtn'), simRecordList: $('#simRecordList'), cloudStatus: $('#cloudStatus'), cloudMessage: $('#cloudMessage'), publicSourceNote: $('#publicSourceNote')
+  languageSelect: $('#languageSelect'), accountToggleBtn: $('#accountToggleBtn'), accountPopover: $('#accountPopover'), recordForm: $('#recordForm'), editingId: $('#editingId'), nameInput: $('#nameInput'), dateInput: $('#dateInput'), performanceSelect: $('#performanceSelect'), customPerformanceField: $('#customPerformanceField'), customPerformanceInput: $('#customPerformanceInput'), spinCountInput: $('#spinCountInput'), costOutput: $('#costOutput'), winCountInput: $('#winCountInput'), prizeSelect: $('#prizeSelect'), memberSelect: $('#memberSelect'), publicConsentInput: $('#publicConsentInput'), clearFormBtn: $('#clearFormBtn'), downloadCurrentBtn: $('#downloadCurrentBtn'), previewCanvas: $('#previewCanvas'), recordList: $('#recordList'), exportJsonBtn: $('#exportJsonBtn'), importJsonInput: $('#importJsonInput'), deleteAllBtn: $('#deleteAllBtn'), kpiGrid: $('#kpiGrid'), pieCanvas: $('#pieCanvas'), barCanvas: $('#barCanvas'), radarCanvas: $('#radarCanvas'), winRateCanvas: $('#winRateCanvas'), timelineCanvas: $('#timelineCanvas'), memberHeatmap: $('#memberHeatmap'), memberRanking: $('#memberRanking'), performanceRanking: $('#performanceRanking'), winRateRanking: $('#winRateRanking'), roiRanking: $('#roiRanking'), imageDialog: $('#imageDialog'), dialogImage: $('#dialogImage'), closeDialogBtn: $('#closeDialogBtn'), garaponMachine: $('#garaponMachine'), garaponDrum: $('#garaponDrum'), garaponHandle: $('#garaponHandle'), lastBall: $('#lastBall'), simHint: $('#simHint'), simTotalTurns: $('#simTotalTurns'), simWinRate: $('#simWinRate'), resetSimulatorBtn: $('#resetSimulatorBtn'), simRecordList: $('#simRecordList'), cloudStatus: $('#cloudStatus'), cloudMessage: $('#cloudMessage'), publicSourceNote: $('#publicSourceNote')
 };
 
 // Future backend adapter reservation.
@@ -725,14 +743,14 @@ function toDbRecord(record, userId) {
   return {
     user_id: userId,
     event_date: record.date || null,
-    performance_id: record.performanceId || null,
+    performance_id: GARAPON_DB_PERFORMANCE_IDS.has(record.performanceId) ? record.performanceId : null,
     spin_count: record.spinCount || 0,
     cost_yen: record.costTotal || 0,
     win_count: record.winCount || 0,
     prize_type: record.prizeId || null,
     member_id: record.twoShotMemberId || null,
     name_private: record.name || null,
-    private_note: null,
+    private_note: serializeCloudPerformanceMetadata(record),
     public_consent: Boolean(record.isPublic),
     public_status: record.isPublic ? 'approved' : 'private',
     source: 'web',
@@ -740,12 +758,14 @@ function toDbRecord(record, userId) {
 }
 
 function fromDbRecord(row) {
+  const performanceMetadata = parseCloudPerformanceMetadata(row.private_note);
   return {
     id: `cloud_${row.id}`,
     cloudRecordId: row.id,
     name: row.name_private || '',
     date: row.event_date || '',
-    performanceId: row.performance_id || '',
+    performanceId: row.performance_id || performanceMetadata.performanceId || '',
+    performanceLabel: performanceMetadata.performanceLabel || '',
     spinCount: row.spin_count ?? null,
     costTotal: row.cost_yen ?? null,
     winCount: row.win_count ?? null,
@@ -754,7 +774,7 @@ function fromDbRecord(row) {
     isPublic: Boolean(row.public_consent),
     createdAt: row.created_at || new Date().toISOString(),
     updatedAt: row.updated_at || row.created_at || new Date().toISOString(),
-    schemaVersion: 2,
+    schemaVersion: 3,
   };
 }
 
@@ -762,6 +782,7 @@ function publicPayloadFromRecord(record) {
   return {
     event_date: record.date || null,
     performance_id: record.performanceId || null,
+    performance_label: getRecordPerformanceLabel(record),
     spin_count: record.spinCount || 0,
     cost_yen: record.costTotal || 0,
     win_count: record.winCount || 0,
@@ -776,18 +797,41 @@ function recordFromPublicPayload(payload) {
     name: '',
     date: payload?.event_date || '',
     performanceId: payload?.performance_id || '',
+    performanceLabel: payload?.performance_label || '',
     spinCount: payload?.spin_count ?? null,
     costTotal: payload?.cost_yen ?? null,
     winCount: payload?.win_count ?? null,
     prizeId: payload?.prize_type || '',
     twoShotMemberId: payload?.member_id || '',
     isPublic: true,
-    schemaVersion: 2,
+    schemaVersion: 3,
   };
 }
 
 function getRecordSignature(record) {
-  return [record.date || '', record.performanceId || '', record.spinCount || 0, record.winCount || 0, record.prizeId || '', record.twoShotMemberId || '', record.createdAt || ''].join('|');
+  return [record.date || '', record.performanceId || '', record.performanceLabel || '', record.spinCount || 0, record.winCount || 0, record.prizeId || '', record.twoShotMemberId || '', record.createdAt || ''].join('|');
+}
+
+function serializeCloudPerformanceMetadata(record) {
+  if (!record.performanceId || GARAPON_DB_PERFORMANCE_IDS.has(record.performanceId)) return null;
+  return JSON.stringify({
+    tool48Performance: {
+      id: record.performanceId,
+      label: getRecordPerformanceLabel(record),
+    },
+  });
+}
+
+function parseCloudPerformanceMetadata(value) {
+  try {
+    const parsed = value ? JSON.parse(value) : null;
+    return {
+      performanceId: parsed?.tool48Performance?.id || '',
+      performanceLabel: parsed?.tool48Performance?.label || '',
+    };
+  } catch {
+    return { performanceId: '', performanceLabel: '' };
+  }
 }
 
 async function saveRecordToCloud(record) {
@@ -846,7 +890,7 @@ async function syncLocalRecordsToCloud() {
     const user = getAuthUser();
     if (!client || !user) throw new Error(t('cloudLoginRequired'));
     const existing = await client.from('garapon_records')
-      .select('id,event_date,performance_id,spin_count,win_count,prize_type,member_id,created_at', { count: 'exact' })
+      .select('id,event_date,performance_id,spin_count,win_count,prize_type,member_id,private_note,created_at', { count: 'exact' })
       .eq('user_id', user.id)
       .limit(GARAPON_CLOUD_RECORD_LIMIT);
     if (existing.error) throw existing.error;
@@ -880,7 +924,7 @@ async function loadCloudRecords(options = {}) {
     const user = getAuthUser();
     if (!client || !user) throw new Error(t('cloudLoginRequired'));
     const { data, error } = await client.from('garapon_records')
-      .select('id,event_date,performance_id,spin_count,cost_yen,win_count,prize_type,member_id,name_private,public_consent,created_at,updated_at')
+      .select('id,event_date,performance_id,spin_count,cost_yen,win_count,prize_type,member_id,name_private,private_note,public_consent,created_at,updated_at')
       .eq('user_id', user.id)
       .order('created_at', { ascending: false })
       .limit(GARAPON_CLOUD_RECORD_LIMIT);
@@ -962,7 +1006,7 @@ function applyLanguage() {
   els.languageSelect.value = appState.lang;
   $$('[data-i18n]').forEach((node) => { node.textContent = t(node.dataset.i18n); });
   $$('[data-i18n-placeholder]').forEach((node) => { node.placeholder = t(node.dataset.i18nPlaceholder); });
-  populatePrizeOptions(); populateMemberOptions(); renderAccountNav(); renderPreviewFromForm(); renderRecords(); renderPublicStats(); renderSimulator(); updateSubmitButtonLabel();
+  populatePerformanceOptions(); populatePrizeOptions(); populateMemberOptions(); renderAccountNav(); renderPreviewFromForm(); renderRecords(); renderPublicStats(); renderSimulator(); updateSubmitButtonLabel();
 }
 
 function normalizeName(value) { return String(value || '').replace(/\s+/g, '').trim(); }
@@ -972,6 +1016,22 @@ function formatPercent(value) { return Number.isFinite(value) ? `${value.toFixed
 function formatDecimal(value, digits = 2) { return Number.isFinite(value) ? value.toFixed(digits) : t('notAvailable'); }
 function formatDate(value) { if (!value) return ''; const date = new Date(`${value}T00:00:00`); if (Number.isNaN(date.getTime())) return value; return new Intl.DateTimeFormat(appState.lang === 'ja' ? 'ja-JP' : undefined, { year: 'numeric', month: '2-digit', day: '2-digit' }).format(date); }
 function getPerformance(id) { return PERFORMANCES.find((item) => item.id === id) || null; }
+function getPerformanceOptionLabel(item) { return item?.labelKey ? t(item.labelKey) : item?.label || ''; }
+function getRecordPerformanceLabel(record) {
+  if (!record?.performanceId) return '';
+  if (record.performanceId === 'other') return String(record.performanceLabel || '').trim() || t('otherPerformance');
+  return getPerformanceOptionLabel(getPerformance(record.performanceId)) || String(record.performanceLabel || '').trim();
+}
+function getPerformanceStatsKey(record) {
+  if (!record?.performanceId) return 'none';
+  if (record.performanceId === 'other') return `other:${getRecordPerformanceLabel(record)}`;
+  return record.performanceId;
+}
+function getPerformanceStatsLabel(key) {
+  if (key === 'none') return t('noPerformance');
+  if (key.startsWith('other:')) return key.slice(6) || t('otherPerformance');
+  return getPerformanceOptionLabel(getPerformance(key)) || key;
+}
 function getPrize(id) { return PRIZES.find((item) => item.id === id) || PRIZES[0]; }
 function getPrizeLabel(id, preferJapanese = false) { if (!id) return ''; if (preferJapanese) return getPrize(id).labelJa; if (id === 'twoShot') return t('twoShot'); if (id === 'sendOff') return t('sendOff'); return getPrize(id).labelJa || id; }
 function getMember(id) { return appState.members.find((member) => String(member.id) === String(id)) || null; }
@@ -988,7 +1048,19 @@ function loadRecords() {
 }
 function persistRecords() { localStorage.setItem(GARAPON_CONFIG.storageKey, JSON.stringify(appState.records)); }
 
-function populatePerformanceOptions() { els.performanceSelect.innerHTML = ''; els.performanceSelect.append(new Option(t('selectPlaceholder'), '')); PERFORMANCES.forEach((item) => els.performanceSelect.append(new Option(item.label, item.id))); }
+function populatePerformanceOptions() {
+  const current = els.performanceSelect.value;
+  els.performanceSelect.innerHTML = '';
+  els.performanceSelect.append(new Option(t('selectPlaceholder'), ''));
+  PERFORMANCES.forEach((item) => els.performanceSelect.append(new Option(getPerformanceOptionLabel(item), item.id)));
+  els.performanceSelect.value = PERFORMANCES.some((item) => item.id === current) ? current : '';
+  toggleCustomPerformanceField();
+}
+function toggleCustomPerformanceField() {
+  const isOther = els.performanceSelect.value === 'other';
+  els.customPerformanceField.hidden = !isOther;
+  els.customPerformanceInput.disabled = !isOther;
+}
 function populatePrizeOptions() { const current = els.prizeSelect.value; els.prizeSelect.innerHTML = ''; els.prizeSelect.append(new Option(t('selectPlaceholder'), '')); PRIZES.filter((item) => item.id).forEach((item) => els.prizeSelect.append(new Option(getPrizeLabel(item.id), item.id))); els.prizeSelect.value = current; }
 function populateMemberOptions() { const current = els.memberSelect.value; els.memberSelect.innerHTML = ''; els.memberSelect.append(new Option(t('memberPlaceholder'), '')); appState.members.filter(isSelectableMember).forEach((member) => els.memberSelect.append(new Option(getMemberDisplay(member), String(member.id)))); els.memberSelect.value = current; }
 function updateCost() { const spins = parseOptionalInt(els.spinCountInput.value) || 0; els.costOutput.value = formatYen(spins * GARAPON_CONFIG.yenPerSpin); els.costOutput.textContent = formatYen(spins * GARAPON_CONFIG.yenPerSpin); }
@@ -999,11 +1071,29 @@ function collectFormRecord({ keepId = true } = {}) {
   const now = new Date().toISOString();
   const editingId = els.editingId.value;
   const oldRecord = editingId ? appState.records.find((record) => record.id === editingId) : null;
-  return { id: keepId && editingId ? editingId : generateId(), cloudRecordId: oldRecord?.cloudRecordId || null, name: els.nameInput.value.trim(), date: els.dateInput.value, performanceId: els.performanceSelect.value, spinCount, costTotal: spinCount === null ? null : spinCount * GARAPON_CONFIG.yenPerSpin, winCount, prizeId: els.prizeSelect.value, twoShotMemberId: els.memberSelect.value, isPublic: els.publicConsentInput.checked, createdAt: oldRecord?.createdAt || now, updatedAt: now, schemaVersion: 2 };
+  const performanceId = els.performanceSelect.value;
+  return { id: keepId && editingId ? editingId : generateId(), cloudRecordId: oldRecord?.cloudRecordId || null, name: els.nameInput.value.trim(), date: els.dateInput.value, performanceId, performanceLabel: performanceId === 'other' ? els.customPerformanceInput.value.trim() : '', spinCount, costTotal: spinCount === null ? null : spinCount * GARAPON_CONFIG.yenPerSpin, winCount, prizeId: els.prizeSelect.value, twoShotMemberId: els.memberSelect.value, isPublic: els.publicConsentInput.checked, createdAt: oldRecord?.createdAt || now, updatedAt: now, schemaVersion: 3 };
 }
 
-function fillForm(record) { els.editingId.value = record.id || ''; els.nameInput.value = record.name || ''; els.dateInput.value = record.date || ''; els.performanceSelect.value = record.performanceId || ''; els.spinCountInput.value = record.spinCount ?? ''; els.winCountInput.value = record.winCount ?? ''; els.prizeSelect.value = record.prizeId || ''; els.memberSelect.value = record.twoShotMemberId || ''; els.publicConsentInput.checked = Boolean(record.isPublic); updateCost(); renderPreview(record); updateSubmitButtonLabel(); }
-function resetForm() { els.recordForm.reset(); els.editingId.value = ''; els.performanceSelect.value = ''; els.prizeSelect.value = ''; els.memberSelect.value = ''; updateCost(); renderPreviewFromForm(); updateSubmitButtonLabel(); }
+function fillForm(record) {
+  els.editingId.value = record.id || '';
+  els.nameInput.value = record.name || '';
+  els.dateInput.value = record.date || '';
+  const hasKnownPerformance = PERFORMANCES.some((item) => item.id === record.performanceId);
+  els.performanceSelect.value = hasKnownPerformance ? record.performanceId : (record.performanceLabel ? 'other' : '');
+  els.customPerformanceInput.value = record.performanceLabel || '';
+  toggleCustomPerformanceField();
+  els.spinCountInput.value = record.spinCount ?? '';
+  els.winCountInput.value = record.winCount ?? '';
+  els.prizeSelect.value = record.prizeId || '';
+  els.memberSelect.value = record.twoShotMemberId || '';
+  els.publicConsentInput.checked = Boolean(record.isPublic);
+  updateCost(); renderPreview(record); updateSubmitButtonLabel();
+}
+function resetForm() {
+  els.recordForm.reset(); els.editingId.value = ''; els.performanceSelect.value = ''; els.customPerformanceInput.value = ''; els.prizeSelect.value = ''; els.memberSelect.value = '';
+  toggleCustomPerformanceField(); updateCost(); renderPreviewFromForm(); updateSubmitButtonLabel();
+}
 function updateSubmitButtonLabel() { const submitButton = els.recordForm.querySelector('button[type="submit"]'); submitButton.textContent = els.editingId.value ? t('updateRecord') : t('saveRecord'); }
 
 async function saveFormRecord(event) {
@@ -1050,7 +1140,7 @@ function drawRecordCard(ctx, record, width, height) {
   roundRect(ctx, 44, 52, width - 88, height - 104, 42); ctx.fillStyle = 'rgba(255,255,255,0.9)'; ctx.fill();
   drawTextLine(ctx, t('cardTitle'), 80, 92, { font: '900 44px "Noto Sans JP", sans-serif', color: '#172033', maxWidth: 560 });
 
-  const performance = getPerformance(record.performanceId)?.label || '';
+  const performance = getRecordPerformanceLabel(record);
   const memberName = member ? member.name_ja : '';
   const prize = getPrizeLabel(record.prizeId, true);
   const winLine = record.winCount !== null && record.winCount !== undefined ? `${record.winCount}${t('winsUnit')}${prize ? ` / ${prize}` : ''}` : prize;
@@ -1087,7 +1177,7 @@ function showImageDialog(dataUrl) { els.dialogImage.src = dataUrl; if (typeof el
 function renderRecords() {
   if (!appState.records.length) { els.recordList.innerHTML = `<div class="record-empty">${t('noRecords')}</div>`; return; }
   els.recordList.innerHTML = appState.records.map((record) => {
-    const performance = getPerformance(record.performanceId)?.label || t('noPerformance');
+    const performance = getRecordPerformanceLabel(record) || t('noPerformance');
     const prize = getPrizeLabel(record.prizeId) || t('noPrize');
     const member = getMember(record.twoShotMemberId);
     const title = [record.name || t('anonymous'), formatDate(record.date), performance].filter(Boolean).join(' ・ ');
@@ -1100,7 +1190,7 @@ function handleRecordListClick(event) { const button = event.target.closest('but
 async function deleteRecord(id) { if (!confirm(t('confirmDelete'))) return; const removedRecord = appState.records.find((record) => record.id === id); appState.records = appState.records.filter((record) => record.id !== id); persistRecords(); try { await backendAdapter.deleteRecord(removedRecord); } catch (error) { console.warn('Garapon cloud delete failed', error); setCloudMessage(error.message || t('cloudFailed')); } renderRecords(); await refreshCloudPublicStats(); renderPublicStats(); if (els.editingId.value === id) resetForm(); }
 function deleteAllRecords() { if (!appState.records.length) return; if (!confirm(t('confirmDeleteAll'))) return; appState.records = []; persistRecords(); resetForm(); renderRecords(); renderPublicStats(); }
 function exportJson() { const payload = { app: 'gomensensei-garapon-challenge-log', exportedAt: new Date().toISOString(), records: appState.records }; const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' }); const url = URL.createObjectURL(blob); const link = document.createElement('a'); link.href = url; link.download = `garapon-records-${new Date().toISOString().slice(0, 10)}.json`; link.click(); URL.revokeObjectURL(url); }
-function importJson(event) { const file = event.target.files?.[0]; if (!file) return; const reader = new FileReader(); reader.onload = () => { try { const parsed = JSON.parse(String(reader.result || '{}')); const incoming = Array.isArray(parsed) ? parsed : parsed.records; if (!Array.isArray(incoming)) throw new Error('Invalid JSON'); const normalized = incoming.map((record) => ({ ...record, id: record.id || generateId(), schemaVersion: 2 })); const existingIds = new Set(appState.records.map((record) => record.id)); normalized.forEach((record) => { if (existingIds.has(record.id)) record.id = generateId(); }); appState.records = [...normalized, ...appState.records]; persistRecords(); renderRecords(); renderPublicStats(); toast(t('imported')); } catch { toast(t('importFailed')); } finally { event.target.value = ''; } }; reader.readAsText(file); }
+function importJson(event) { const file = event.target.files?.[0]; if (!file) return; const reader = new FileReader(); reader.onload = () => { try { const parsed = JSON.parse(String(reader.result || '{}')); const incoming = Array.isArray(parsed) ? parsed : parsed.records; if (!Array.isArray(incoming)) throw new Error('Invalid JSON'); const normalized = incoming.map((record) => ({ ...record, id: record.id || generateId(), schemaVersion: 3 })); const existingIds = new Set(appState.records.map((record) => record.id)); normalized.forEach((record) => { if (existingIds.has(record.id)) record.id = generateId(); }); appState.records = [...normalized, ...appState.records]; persistRecords(); renderRecords(); renderPublicStats(); toast(t('imported')); } catch { toast(t('importFailed')); } finally { event.target.value = ''; } }; reader.readAsText(file); }
 function switchTab(name) { $$('.tab-button').forEach((button) => button.classList.toggle('active', button.dataset.tab === name)); $$('.tab-panel').forEach((panel) => panel.classList.toggle('active', panel.id === `tab-${name}`)); if (name === 'public') { renderPublicStats(); refreshCloudPublicStats(); } if (name === 'simulator') renderSimulator(); }
 
 function getPublicRecords() { return appState.cloudStatsLoaded ? appState.cloudPublicRecords : appState.records.filter((record) => record.isPublic); }
@@ -1115,12 +1205,12 @@ function summarizePublic(records) {
   const winTotal = records.reduce((sum, record) => sum + (record.winCount || 0), 0);
   const peopleCount = namedPeople.size || records.length;
   const prizeCounts = countBy(records, (record) => record.prizeId || 'none');
-  const performanceSpins = groupSum(records, (record) => record.performanceId || 'none', (record) => record.spinCount || 0);
-  const performanceRecords = countBy(records, (record) => record.performanceId || 'none');
+  const performanceSpins = groupSum(records, getPerformanceStatsKey, (record) => record.spinCount || 0);
+  const performanceRecords = countBy(records, getPerformanceStatsKey);
   const memberCounts = countBy(records.filter((record) => record.twoShotMemberId), (record) => record.twoShotMemberId);
   const performanceStats = {};
   records.forEach((record) => {
-    const key = record.performanceId || 'none';
+    const key = getPerformanceStatsKey(record);
     if (!performanceStats[key]) performanceStats[key] = { records: 0, spins: 0, wins: 0, cost: 0 };
     performanceStats[key].records += 1;
     performanceStats[key].spins += record.spinCount || 0;
@@ -1166,9 +1256,9 @@ function renderPublicStats() {
   const sampleNotice = usingCloudStats && publicRecords.length < 10 ? `<div class="record-empty public-threshold-note">${t('publicNotEnough')}</div>` : '';
   els.kpiGrid.innerHTML = `${sampleNotice}${allKpis.map(([label, value]) => `<div class="kpi-card"><small>${escapeHtml(label)}</small><strong>${escapeHtml(value)}</strong></div>`).join('')}`;
   drawPieChart(els.pieCanvas, Object.entries(summary.prizeCounts).map(([id, count]) => ({ label: id === 'none' ? t('noPrize') : getPrizeLabel(id), value: count })));
-  drawBarChart(els.barCanvas, Object.entries(summary.performanceSpins).map(([id, count]) => ({ label: id === 'none' ? t('noPerformance') : getPerformance(id)?.label || id, value: count })));
+  drawBarChart(els.barCanvas, Object.entries(summary.performanceSpins).map(([id, count]) => ({ label: getPerformanceStatsLabel(id), value: count })));
   drawRadarChart(els.radarCanvas, [{ label: t('people'), value: summary.peopleCount, max: Math.max(summary.peopleCount, 10) }, { label: t('records'), value: summary.recordCount, max: Math.max(summary.recordCount, 10) }, { label: t('lotteryBalls'), value: summary.spinTotal, max: Math.max(summary.spinTotal, 50) }, { label: t('cost'), value: summary.costTotal / 500, max: Math.max(summary.costTotal / 500, 50) }, { label: t('wins'), value: summary.winTotal, max: Math.max(summary.winTotal, 10) }, { label: t('winRate'), value: Number.isFinite(summary.winRate) ? summary.winRate : 0, max: 100 }]);
-  drawBarChart(els.winRateCanvas, Object.entries(summary.performanceStats).map(([id, item]) => ({ label: id === 'none' ? t('noPerformance') : getPerformance(id)?.label || id, value: Number.isFinite(item.winRate) ? item.winRate : 0, suffix: '%' })));
+  drawBarChart(els.winRateCanvas, Object.entries(summary.performanceStats).map(([id, item]) => ({ label: getPerformanceStatsLabel(id), value: Number.isFinite(item.winRate) ? item.winRate : 0, suffix: '%' })));
   drawTimelineChart(els.timelineCanvas, summary.timeline);
   renderRankings(summary);
 }
@@ -1187,11 +1277,11 @@ function renderRankings(summary) {
   const maxMember = Math.max(...Object.values(summary.memberCounts), 1);
   const heatRows = Object.entries(summary.memberCounts).sort((a, b) => b[1] - a[1]).slice(0, 24).map(([id, count]) => { const member = getMember(id); const name = member ? (member.nickname || member.name_ja) : id; const heat = 0.12 + (count / maxMember) * 0.48; return `<div class="heatmap-cell" style="--heat:${heat.toFixed(2)}"><strong>${escapeHtml(name)}</strong><small>${count}</small></div>`; });
   els.memberHeatmap.innerHTML = heatRows.length ? heatRows.join('') : `<div class="ranking-empty">${t('noPublicRecords')}</div>`;
-  const perfRows = Object.entries(summary.performanceStats).sort((a, b) => b[1].spins - a[1].spins).map(([id, item]) => [id === 'none' ? t('noPerformance') : getPerformance(id)?.label || id, `${item.records}${t('records')} / ${item.spins}${t('spinsUnit')} / ${item.wins}${t('winsUnit')}`]);
+  const perfRows = Object.entries(summary.performanceStats).sort((a, b) => b[1].spins - a[1].spins).map(([id, item]) => [getPerformanceStatsLabel(id), `${item.records}${t('records')} / ${item.spins}${t('spinsUnit')} / ${item.wins}${t('winsUnit')}`]);
   els.performanceRanking.innerHTML = perfRows.length ? perfRows.map(([name, value]) => `<div class="ranking-row"><span>${escapeHtml(name)}</span><span>${escapeHtml(value)}</span></div>`).join('') : `<div class="ranking-empty">${t('noPublicRecords')}</div>`;
-  const winRateRows = Object.entries(summary.performanceStats).sort((a, b) => (Number.isFinite(b[1].winRate) ? b[1].winRate : -1) - (Number.isFinite(a[1].winRate) ? a[1].winRate : -1)).map(([id, item]) => [id === 'none' ? t('noPerformance') : getPerformance(id)?.label || id, `${formatPercent(item.winRate)} (${item.wins}/${item.spins})`]);
+  const winRateRows = Object.entries(summary.performanceStats).sort((a, b) => (Number.isFinite(b[1].winRate) ? b[1].winRate : -1) - (Number.isFinite(a[1].winRate) ? a[1].winRate : -1)).map(([id, item]) => [getPerformanceStatsLabel(id), `${formatPercent(item.winRate)} (${item.wins}/${item.spins})`]);
   els.winRateRanking.innerHTML = winRateRows.length ? winRateRows.map(([name, value]) => `<div class="ranking-row"><span>${escapeHtml(name)}</span><span>${escapeHtml(value)}</span></div>`).join('') : `<div class="ranking-empty">${t('noPublicRecords')}</div>`;
-  const roiRows = Object.entries(summary.performanceStats).sort((a, b) => (Number.isFinite(b[1].roiPer1000) ? b[1].roiPer1000 : -1) - (Number.isFinite(a[1].roiPer1000) ? a[1].roiPer1000 : -1)).map(([id, item]) => [id === 'none' ? t('noPerformance') : getPerformance(id)?.label || id, `${formatDecimal(item.roiPer1000, 2)} ${t('perThousand')} / ${Number.isFinite(item.costPerWin) ? formatYen(item.costPerWin) : t('notAvailable')} ${t('perHit')}`]);
+  const roiRows = Object.entries(summary.performanceStats).sort((a, b) => (Number.isFinite(b[1].roiPer1000) ? b[1].roiPer1000 : -1) - (Number.isFinite(a[1].roiPer1000) ? a[1].roiPer1000 : -1)).map(([id, item]) => [getPerformanceStatsLabel(id), `${formatDecimal(item.roiPer1000, 2)} ${t('perThousand')} / ${Number.isFinite(item.costPerWin) ? formatYen(item.costPerWin) : t('notAvailable')} ${t('perHit')}`]);
   els.roiRanking.innerHTML = roiRows.length ? roiRows.map(([name, value]) => `<div class="ranking-row"><span>${escapeHtml(name)}</span><span>${escapeHtml(value)}</span></div>`).join('') : `<div class="ranking-empty">${t('noPublicRecords')}</div>`;
 }
 
@@ -1399,7 +1489,7 @@ function bindCloudEvents() {
 }
 
 async function loadMembers() { try { const response = await fetch('members.json', { cache: 'no-store' }); if (!response.ok) throw new Error('members.json not found'); appState.members = await response.json(); if (typeof initSilentPreloader === 'function') initSilentPreloader(appState.members, 'image', 'imgLoaded'); } catch { appState.members = []; } }
-function bindEvents() { els.languageSelect.addEventListener('change', () => { appState.lang = els.languageSelect.value; localStorage.setItem(GARAPON_CONFIG.languageKey, appState.lang); applyLanguage(); }); $$('.tab-button').forEach((button) => button.addEventListener('click', () => switchTab(button.dataset.tab))); els.recordForm.addEventListener('submit', saveFormRecord); ['input', 'change'].forEach((eventName) => { [els.nameInput, els.dateInput, els.performanceSelect, els.spinCountInput, els.winCountInput, els.prizeSelect, els.memberSelect, els.publicConsentInput].forEach((node) => node.addEventListener(eventName, debounce(renderPreviewFromForm, 60))); }); els.clearFormBtn.addEventListener('click', resetForm); els.downloadCurrentBtn.addEventListener('click', () => downloadRecordCard(collectFormRecord({ keepId: false }))); els.recordList.addEventListener('click', handleRecordListClick); els.exportJsonBtn.addEventListener('click', exportJson); els.importJsonInput.addEventListener('change', importJson); els.deleteAllBtn.addEventListener('click', deleteAllRecords); els.closeDialogBtn.addEventListener('click', () => els.imageDialog.close()); bindSimulatorEvents(); bindAccountPopover(); bindCloudEvents(); window.addEventListener('resize', debounce(() => { renderPreviewFromForm(); renderPublicStats(); }, 180)); }
+function bindEvents() { els.languageSelect.addEventListener('change', () => { appState.lang = els.languageSelect.value; localStorage.setItem(GARAPON_CONFIG.languageKey, appState.lang); applyLanguage(); }); $$('.tab-button').forEach((button) => button.addEventListener('click', () => switchTab(button.dataset.tab))); els.recordForm.addEventListener('submit', saveFormRecord); ['input', 'change'].forEach((eventName) => { [els.nameInput, els.dateInput, els.performanceSelect, els.customPerformanceInput, els.spinCountInput, els.winCountInput, els.prizeSelect, els.memberSelect, els.publicConsentInput].forEach((node) => node.addEventListener(eventName, debounce(renderPreviewFromForm, 60))); }); els.performanceSelect.addEventListener('change', toggleCustomPerformanceField); els.clearFormBtn.addEventListener('click', resetForm); els.downloadCurrentBtn.addEventListener('click', () => downloadRecordCard(collectFormRecord({ keepId: false }))); els.recordList.addEventListener('click', handleRecordListClick); els.exportJsonBtn.addEventListener('click', exportJson); els.importJsonInput.addEventListener('change', importJson); els.deleteAllBtn.addEventListener('click', deleteAllRecords); els.closeDialogBtn.addEventListener('click', () => els.imageDialog.close()); bindSimulatorEvents(); bindAccountPopover(); bindCloudEvents(); window.addEventListener('resize', debounce(() => { renderPreviewFromForm(); renderPublicStats(); }, 180)); }
 async function init() { appState.lang = detectLanguage(); loadRecords(); loadSimulatorState(); populatePerformanceOptions(); await loadMembers(); populateMemberOptions(); bindEvents(); applyLanguage(); updateCost(); renderRecords(); renderPublicStats(); renderSimulator(); renderPreviewFromForm(); }
 
 document.addEventListener('DOMContentLoaded', init);

@@ -228,6 +228,8 @@ input, select { min-width: 0; }
   min-width: 0;
 }
 .field.wide { grid-column: 1 / -1; }
+.field[hidden] { display: none !important; }
+.custom-performance-field { grid-column: 1 / -1 !important; }
 .field span, .public-consent strong {
   font-weight: 900;
   font-size: 12px;
